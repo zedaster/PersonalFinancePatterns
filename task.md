@@ -1,3 +1,15 @@
+## Задание 2. Singleton
+
+Класс: StandardCategoryConfiguration [(ссылка)](src/main/java/ru/naumen/personalfinancebot/configuration/StandardCategoryConfiguration.java)
+
+### Причины реализации паттерна
+* Приложению необходим лишь один класс этого экземпляра
+* В конструкторе этого класса идет считывание файла конфигурации. Singleton помогает избежать повторного вызова этой 
+операции.
+* Отсутствие повторного вызова также гарантирует консистентность данных (список категорий будет всегда такой же)
+
+
+
 ## Задание 7. Abstract Factory
 
 Пакет: ru.naumen.personalfinancebot.repository  [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository)

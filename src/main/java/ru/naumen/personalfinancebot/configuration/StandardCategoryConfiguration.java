@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 /**
  * Класс, который работает с конфигурацией для стандартных категорий
  */
+// Паттерн Singleton
 public class StandardCategoryConfiguration {
     /**
      * Путь к ресурсу с конфигурацией
@@ -21,12 +22,24 @@ public class StandardCategoryConfiguration {
     private static final String CONFIG_RESOURCE_PATH = "standard_categories.yaml";
 
     /**
+     * Один единственный экземпляр конфигурации
+     */
+    private static final StandardCategoryConfiguration instance = new StandardCategoryConfiguration();
+
+    /**
      * Хранит список категорий
      */
     private final List<Category> categories;
 
-    public StandardCategoryConfiguration() {
+    private StandardCategoryConfiguration() {
         this.categories = parseCategories();
+    }
+
+    /**
+     * Возвращает единственный экземпляр для работы с конфигурацией для стандартных категорий
+     */
+    public static StandardCategoryConfiguration getInstance() {
+        return instance;
     }
 
     /**

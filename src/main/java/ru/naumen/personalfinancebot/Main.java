@@ -35,7 +35,9 @@ public class Main {
         SessionFactory sessionFactory = hibernateConfiguration.getSessionFactory();
         TransactionManager transactionManager = new TransactionManager(sessionFactory);
 
-        List<Category> standardCategories = new StandardCategoryConfiguration().getStandardCategories();
+        List<Category> standardCategories = StandardCategoryConfiguration
+                .getInstance()
+                .getStandardCategories();
 
         RepositoryFactory repositoryFactory = new HibernateRepositoryFactory(transactionManager);
         UserRepository userRepository = repositoryFactory.newUserRepository();
