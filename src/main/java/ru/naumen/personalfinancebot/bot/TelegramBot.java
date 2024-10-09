@@ -19,6 +19,7 @@ import java.util.Optional;
 /**
  * Телеграм бот
  */
+// Паттерн Adapter
 public class TelegramBot extends TelegramLongPollingBot implements Bot {
     private static final String POLLING_EXCEPTION = "При запуске Телеграм Бота произошла ошибка. ";
 
@@ -28,7 +29,7 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
     private final TelegramBotConfiguration configuration;
 
     /**
-     * Класс-оработчик комманд
+     * Класс-обработчик команд
      */
     private final FinanceBotHandler botHandler;
 
@@ -44,7 +45,7 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
 
     /**
      * @param configuration      Настройки для телеграм бота
-     * @param botHandler         Класс-оработчик комманд
+     * @param botHandler         Класс-обработчик команд
      * @param userRepository     Репозиторий для работы с пользователем
      * @param transactionManager Менеджер транзакций
      */
