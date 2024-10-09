@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /**
  * Реализация интерфейса {@link BudgetRepository}
- * Репозиторий для работы с моделью даднных {@link Budget}
+ * Репозиторий для работы с моделью данных {@link Budget}
  */
 public class HibernateBudgetRepository implements BudgetRepository {
     @Override

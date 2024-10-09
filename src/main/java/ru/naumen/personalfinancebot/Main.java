@@ -9,6 +9,8 @@ import ru.naumen.personalfinancebot.configuration.StandardCategoryConfiguration;
 import ru.naumen.personalfinancebot.configuration.TelegramBotConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.repository.HibernateRepositoryFactory;
+import ru.naumen.personalfinancebot.repository.RepositoryFactory;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
 import ru.naumen.personalfinancebot.repository.budget.HibernateBudgetRepository;
@@ -35,10 +37,11 @@ public class Main {
 
         List<Category> standardCategories = new StandardCategoryConfiguration().getStandardCategories();
 
-        UserRepository userRepository = new HibernateUserRepository();
-        OperationRepository operationRepository = new HibernateOperationRepository();
-        CategoryRepository categoryRepository = new HibernateCategoryRepository(transactionManager, standardCategories);
-        BudgetRepository budgetRepository = new HibernateBudgetRepository();
+        RepositoryFactory repositoryFactory = new HibernateRepositoryFactory(transactionManager);
+        UserRepository userRepository = repositoryFactory.newUserRepository();
+        OperationRepository operationRepository = repositoryFactory.newOperationRepository();
+        CategoryRepository categoryRepository = repositoryFactory.newCategoryRepository(standardCategories);
+        BudgetRepository budgetRepository = repositoryFactory.newBudgetRepository();
 
         FinanceBotHandler handler = new FinanceBotHandler(
                 userRepository,
