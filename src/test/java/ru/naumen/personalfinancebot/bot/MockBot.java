@@ -1,5 +1,6 @@
 package ru.naumen.personalfinancebot.bot;
 
+import ru.naumen.personalfinancebot.mode.NormalFormatMode;
 import ru.naumen.personalfinancebot.model.User;
 
 import java.util.LinkedList;
@@ -9,13 +10,14 @@ import java.util.Queue;
  * Моковый бот, который позволяет получать сообщения, отправленные через него.
  * История сообщения храниться в формате очередь
  */
-public class MockBot implements Bot {
+public class MockBot extends Bot {
     /**
      * Очередь, в которую помещаються отправленные сообщения
      */
     private final Queue<MockMessage> messageQueue;
 
     public MockBot() {
+        super(new NormalFormatMode());
         this.messageQueue = new LinkedList<>();
     }
 
@@ -31,7 +33,7 @@ public class MockBot implements Bot {
      * Отправка сообщения
      */
     @Override
-    public void sendMessage(User user, String text) {
+    public void internalSendMessage(User user, String text) {
         MockMessage message = new MockMessage(user, text);
         messageQueue.add(message);
     }

@@ -1,7 +1,6 @@
 package ru.naumen.personalfinancebot.bot;
 
 import org.hibernate.Session;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.naumen.personalfinancebot.configuration.TelegramBotConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
@@ -11,7 +10,6 @@ import ru.naumen.personalfinancebot.repository.TransactionManager;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Телеграм бот
@@ -23,16 +21,6 @@ public class TelegramBot extends Bot implements UpdateHandler {
      * Класс-обработчик команд
      */
     private final FinanceBotHandler botHandler;
-
-    /**
-     * Репозиторий для работы с пользователем
-     */
-    private final UserRepository userRepository;
-
-    /**
-     * Менеджер транзакций
-     */
-    private final TransactionManager transactionManager;
 
     /**
      * Режим работы бота
@@ -59,8 +47,6 @@ public class TelegramBot extends Bot implements UpdateHandler {
         super(formatMode);
         this.adapter = new TelegramBotAdapterImpl(configuration, this, transactionManager, userRepository);
         this.botHandler = botHandler;
-        this.userRepository = userRepository;
-        this.transactionManager = transactionManager;
         this.formatMode = formatMode;
     }
 

@@ -6,6 +6,7 @@ import ru.naumen.personalfinancebot.model.User;
 /**
  * Описание методов для бота
  */
+// Паттерн Bridge
 public abstract class Bot {
     /**
      * Режим форматирования бота
