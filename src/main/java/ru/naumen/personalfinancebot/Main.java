@@ -8,6 +8,8 @@ import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.configuration.StandardCategoryConfiguration;
 import ru.naumen.personalfinancebot.configuration.TelegramBotConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
+import ru.naumen.personalfinancebot.mode.FormatMode;
+import ru.naumen.personalfinancebot.mode.NormalFormatMode;
 import ru.naumen.personalfinancebot.model.Category;
 import ru.naumen.personalfinancebot.repository.HibernateRepositoryFactory;
 import ru.naumen.personalfinancebot.repository.RepositoryFactory;
@@ -52,12 +54,17 @@ public class Main {
                 budgetRepository
         );
 
+        // Можно запускать разных ботов с разными режимами форматирования
+
+        FormatMode mode = new NormalFormatMode();
+
         TelegramBotConfiguration configuration = new TelegramBotConfiguration();
         Bot bot = new TelegramBot(
                 configuration,
                 handler,
                 userRepository,
-                transactionManager
+                transactionManager,
+                mode
         );
 
         try {
