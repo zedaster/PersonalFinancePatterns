@@ -1,10 +1,11 @@
 package ru.naumen.personalfinancebot.repository.operation;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 
 import java.time.YearMonth;
 import java.util.Map;
@@ -21,7 +22,7 @@ public interface OperationRepository {
      * @param payment  Плата
      * @return Добавленная операция
      */
-    Operation addOperation(Session session, User user, Category category, double payment);
+    Operation addOperation(Session session, User user, CategoryComponent category, double payment);
 
     /**
      * Возвращает MAP, где ключ - название каатегории, значение - сумма операций по данной категории

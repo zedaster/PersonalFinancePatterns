@@ -9,7 +9,7 @@ import ru.naumen.personalfinancebot.bot.MockMessage;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
@@ -72,22 +72,22 @@ public class ReportExpensesTest {
     private void initOperations(Session session) {
         User user = this.getUser(session, 1L);
         this.userRepository.saveUser(session, user);
-        Category taxiCategory, cleanCategory;
+        CategoryRow taxiCategoryRow, cleanCategoryRow;
         try {
-            taxiCategory = this.categoryRepository.createUserCategory(session, user, CategoryType.EXPENSE, "Такси");
-            cleanCategory = this.categoryRepository.createUserCategory(session, user, CategoryType.EXPENSE, "Химчистка");
+            taxiCategoryRow = this.categoryRepository.createUserCategory(session, user, CategoryType.EXPENSE, "Такси");
+            cleanCategoryRow = this.categoryRepository.createUserCategory(session, user, CategoryType.EXPENSE, "Химчистка");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.operationRepository.addOperation(session, user, taxiCategory, 100);
-        this.operationRepository.addOperation(session, user, taxiCategory, 200);
-        this.operationRepository.addOperation(session, user, taxiCategory, 300);
-        this.operationRepository.addOperation(session, user, taxiCategory, 400);
-        this.operationRepository.addOperation(session, user, taxiCategory, 500);
-        this.operationRepository.addOperation(session, user, cleanCategory, 300);
-        this.operationRepository.addOperation(session, user, cleanCategory, 500);
-        this.operationRepository.addOperation(session, user, cleanCategory, 700);
-        this.operationRepository.addOperation(session, user, cleanCategory, 900);
+        this.operationRepository.addOperation(session, user, taxiCategoryRow, 100);
+        this.operationRepository.addOperation(session, user, taxiCategoryRow, 200);
+        this.operationRepository.addOperation(session, user, taxiCategoryRow, 300);
+        this.operationRepository.addOperation(session, user, taxiCategoryRow, 400);
+        this.operationRepository.addOperation(session, user, taxiCategoryRow, 500);
+        this.operationRepository.addOperation(session, user, cleanCategoryRow, 300);
+        this.operationRepository.addOperation(session, user, cleanCategoryRow, 500);
+        this.operationRepository.addOperation(session, user, cleanCategoryRow, 700);
+        this.operationRepository.addOperation(session, user, cleanCategoryRow, 900);
     }
 
     /**

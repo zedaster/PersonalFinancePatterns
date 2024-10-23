@@ -3,7 +3,7 @@ package ru.naumen.personalfinancebot.model;
 /**
  * Enum для обозначения типа категории:
  * INCOME - ДОХОД, EXPENSE - РАСХОД;
- * Важно не менять порядок внутри этого enum, т.к. от него зависит поле {@link Category#getType()}
+ * Важно не менять порядок внутри этого enum, т.к. от него зависит поле {@link CategoryRow#getType()}
  */
 public enum CategoryType {
     INCOME("income", "доходов"),

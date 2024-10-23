@@ -39,8 +39,8 @@ Bot: Новый баланс установлен.
 Команда <b>/add_expense</b>
 
 ```html
-User: /add_expense [fee - плата] [category - категория]
-Bot: Добавлен расход по категории [category]
+User: /add_expense [fee - плата] [categoryRow - категория]
+Bot: Добавлен расход по категории [categoryRow]
 ```
 
 Команда <b>/add_income</b>

@@ -1,6 +1,6 @@
 package ru.naumen.personalfinancebot.repository;
 
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
@@ -27,7 +27,7 @@ public interface RepositoryFactory {
     /**
      * Создает репозиторий для работы с категориями
      */
-    CategoryRepository newCategoryRepository(List<Category> standardCategories);
+    CategoryRepository newCategoryRepository(List<CategoryComponent> standardCategories);
 
     /**
      * Создает репозиторий для работы с бюджетами

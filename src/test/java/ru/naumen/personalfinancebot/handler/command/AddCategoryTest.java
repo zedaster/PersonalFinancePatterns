@@ -10,7 +10,7 @@ import ru.naumen.personalfinancebot.bot.MockBot;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.ClearQueryManager;
@@ -106,7 +106,7 @@ public class AddCategoryTest {
     @After
     public void afterEachTest() {
         transactionManager.produceTransaction(session -> {
-            this.clearQueryManager.clear(session, Category.class, User.class);
+            this.clearQueryManager.clear(session, CategoryRow.class, User.class);
         });
     }
 
@@ -123,10 +123,10 @@ public class AddCategoryTest {
             CommandData commandData = new CommandData(
                     this.mockBot, this.testUser, ADD_EXPENSE_COMMAND, args);
             this.botHandler.handleCommand(commandData, session);
-            Optional<Category> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, CategoryType.EXPENSE,
+            Optional<CategoryRow> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, CategoryType.EXPENSE,
                     categoryName);
             Assert.assertTrue(addedCategory.isPresent());
-            this.clearQueryManager.clear(session, Category.class);
+            this.clearQueryManager.clear(session, CategoryRow.class);
             Assert.assertEquals(1, this.mockBot.getMessageQueueSize());
             Assert.assertEquals(expectMessage, this.mockBot.poolMessageQueue().text());
         });
@@ -148,7 +148,7 @@ public class AddCategoryTest {
                     CommandData commandData = new CommandData(
                             this.mockBot, this.testUser, commands.get(i), List.of(testCase));
                     this.botHandler.handleCommand(commandData, session);
-                    this.clearQueryManager.clear(session, Category.class);
+                    this.clearQueryManager.clear(session, CategoryRow.class);
                 }
             }
         });
@@ -176,7 +176,7 @@ public class AddCategoryTest {
                     this.mockBot, this.testUser, ADD_INCOME_COMMAND, List.of(some65chars));
             this.botHandler.handleCommand(commandData, session);
             Assert.assertTrue(categoryRepository.getCategoryByName(session, this.testUser, CategoryType.INCOME, some65chars).isEmpty());
-            this.clearQueryManager.clear(session, Category.class);
+            this.clearQueryManager.clear(session, CategoryRow.class);
             Assert.assertEquals(1, this.mockBot.getMessageQueueSize());
             Assert.assertEquals(expectMessage, this.mockBot.poolMessageQueue().text());
         });
@@ -196,7 +196,7 @@ public class AddCategoryTest {
                 CommandData commandData = new CommandData(
                         this.mockBot, this.testUser, ADD_INCOME_COMMAND, List.of(testCase));
                 this.botHandler.handleCommand(commandData, session);
-                this.clearQueryManager.clear(session, Category.class);
+                this.clearQueryManager.clear(session, CategoryRow.class);
             }
             Assert.assertEquals(5, this.mockBot.getMessageQueueSize());
             for (int i = 0; i < 5; i++) {
@@ -221,7 +221,7 @@ public class AddCategoryTest {
                 CommandData command = new CommandData(this.mockBot, this.testUser, commandNames.get(i),
                         List.of(categoryName));
                 botHandler.handleCommand(command, session);
-                Optional<Category> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, types.get(i),
+                Optional<CategoryRow> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, types.get(i),
                         categoryName);
                 Assert.assertTrue(addedCategory.isPresent());
             }
@@ -269,7 +269,7 @@ public class AddCategoryTest {
             botHandler.handleCommand(command, session);
 
             categoryRepository.getCategoryByName(session, this.testUser, CategoryType.INCOME, categoryName); // проверено ранее
-            Optional<Category> shouldBeEmptyCategory = categoryRepository
+            Optional<CategoryRow> shouldBeEmptyCategory = categoryRepository
                     .getCategoryByName(session, secondUser, CategoryType.INCOME, categoryName);
             Assert.assertTrue(shouldBeEmptyCategory.isEmpty());
             userRepository.removeUserById(session, testUser.getId());
@@ -296,7 +296,7 @@ public class AddCategoryTest {
                     List.of(categoryName));
             botHandler.handleCommand(command, session);
 
-            Optional<Category> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, CategoryType.INCOME,
+            Optional<CategoryRow> addedCategory = categoryRepository.getCategoryByName(session, this.testUser, CategoryType.INCOME,
                     categoryName);
             Assert.assertTrue(expectMessage, addedCategory.isPresent());
             Assert.assertTrue(expectMessage, addedCategory.get().isStandard());

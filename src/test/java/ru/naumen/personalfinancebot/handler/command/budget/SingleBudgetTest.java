@@ -72,12 +72,12 @@ public class SingleBudgetTest {
     /**
      * Фейковая категория доходов
      */
-    private Category fakeIncomeCategory;
+    private CategoryRow fakeIncomeCategoryRow;
 
     /**
      * Фейковая категория расходов
      */
-    private Category fakeExpenseCategory;
+    private CategoryRow fakeExpenseCategoryRow;
 
     /**
      * Экземпляр класс фейковой реализации бота
@@ -122,7 +122,7 @@ public class SingleBudgetTest {
     @After
     public void clearRepositories() {
         this.transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Budget.class, Operation.class, Category.class, User.class);
+            new ClearQueryManager().clear(session, Budget.class, Operation.class, CategoryRow.class, User.class);
         });
     }
 
@@ -168,8 +168,8 @@ public class SingleBudgetTest {
             Budget budget = new Budget(this.user, 100_000, 90_000, testYearMonth);
             this.budgetRepository.saveBudget(session, budget);
 
-            this.operationRepository.addOperation(session, this.user, fakeIncomeCategory, 3000);
-            this.operationRepository.addOperation(session, this.user, fakeExpenseCategory, 1000);
+            this.operationRepository.addOperation(session, this.user, fakeIncomeCategoryRow, 3000);
+            this.operationRepository.addOperation(session, this.user, fakeExpenseCategoryRow, 1000);
 
             CommandData command = new CommandData(this.mockBot, this.user, "budget", List.of());
             this.botHandler.handleCommand(command, session);
@@ -201,8 +201,8 @@ public class SingleBudgetTest {
             Budget budget = new Budget(this.user, 100_000, 90_000, testYearMonth);
             this.budgetRepository.saveBudget(session, budget);
 
-            this.operationRepository.addOperation(session, this.user, fakeIncomeCategory, 101_000);
-            this.operationRepository.addOperation(session, this.user, fakeExpenseCategory, 91_000);
+            this.operationRepository.addOperation(session, this.user, fakeIncomeCategoryRow, 101_000);
+            this.operationRepository.addOperation(session, this.user, fakeExpenseCategoryRow, 91_000);
 
             CommandData command = new CommandData(this.mockBot, this.user, "budget", List.of());
             this.botHandler.handleCommand(command, session);
@@ -249,9 +249,9 @@ public class SingleBudgetTest {
     private void addFakeStandardCategories() {
         transactionManager.produceTransaction(session -> {
             try {
-                this.fakeIncomeCategory = this.categoryRepository
+                this.fakeIncomeCategoryRow = this.categoryRepository
                         .createUserCategory(session, this.user, CategoryType.INCOME, "Fake");
-                this.fakeExpenseCategory = this.categoryRepository
+                this.fakeExpenseCategoryRow = this.categoryRepository
                         .createUserCategory(session, this.user, CategoryType.EXPENSE, "Fake");
             } catch (ExistingStandardCategoryException | ExistingUserCategoryException e) {
                 throw new RuntimeException(e);

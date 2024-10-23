@@ -2,9 +2,10 @@ package ru.naumen.personalfinancebot.service;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.message.Message;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 
 import java.util.List;
@@ -38,8 +39,8 @@ public class CategoryListService {
      * Получает текст сообщения для вывода категорий доходов или расходов.
      */
     public String getListContent(Session session, User user, CategoryType categoryType) {
-        List<Category> typedStandardCategories = categoryRepository.getStandardCategoriesByType(session, categoryType);
-        List<Category> personalCategories = categoryRepository.getUserCategoriesByType(session, user, categoryType);
+        List<CategoryComponent> typedStandardCategories = categoryRepository.getStandardCategoriesByType(session, categoryType);
+        List<CategoryComponent> personalCategories = categoryRepository.getUserCategoriesByType(session, user, categoryType);
 
         return LIST_TYPED_CATEGORIES.formatted(
                 categoryType.getPluralShowLabel(),
@@ -52,7 +53,7 @@ public class CategoryListService {
      * Форматирует список категорий в строку, содержащую нумерованный список из названия этих категорий или
      * {@link Message#EMPTY_LIST_CONTENT}, если список пуст.
      */
-    private String formatCategoryList(List<Category> categories) {
+    private String formatCategoryList(List<CategoryComponent> categories) {
         if (categories.isEmpty()) {
             return Message.EMPTY_LIST_CONTENT + "\n";
         }
@@ -62,7 +63,7 @@ public class CategoryListService {
             stringBuilder
                     .append(i + 1)
                     .append(". ")
-                    .append(categories.get(i).getCategoryName())
+                    .append(categories.get(i).getName())
                     .append("\n");
         }
         return stringBuilder.toString();

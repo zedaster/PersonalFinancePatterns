@@ -111,7 +111,7 @@ public class CreateBudgetTest {
     @After
     public void clearRepositories() {
         this.transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Budget.class, Operation.class, Category.class, User.class);
+            new ClearQueryManager().clear(session, Budget.class, Operation.class, CategoryRow.class, User.class);
         });
     }
 
@@ -150,19 +150,19 @@ public class CreateBudgetTest {
     public void currentMonthAndOperations() {
         YearMonth currentYM = YearMonth.now();
         transactionManager.produceTransaction(session -> {
-            Category fakeIncomeCategory;
-            Category fakeExpenseCategory;
+            CategoryRow fakeIncomeCategoryRow;
+            CategoryRow fakeExpenseCategoryRow;
             try {
-                fakeIncomeCategory = this.categoryRepository
+                fakeIncomeCategoryRow = this.categoryRepository
                         .createUserCategory(session, this.user, CategoryType.INCOME, "Fake Income");
-                fakeExpenseCategory = this.categoryRepository
+                fakeExpenseCategoryRow = this.categoryRepository
                         .createUserCategory(session, this.user, CategoryType.EXPENSE, "Fake Expenses");
 
             } catch (ExistingStandardCategoryException | ExistingUserCategoryException e) {
                 throw new RuntimeException(e);
             }
-            this.operationRepository.addOperation(session, this.user, fakeIncomeCategory, 7000);
-            this.operationRepository.addOperation(session, this.user, fakeExpenseCategory, 6000);
+            this.operationRepository.addOperation(session, this.user, fakeIncomeCategoryRow, 7000);
+            this.operationRepository.addOperation(session, this.user, fakeExpenseCategoryRow, 6000);
             CommandData command = new CommandData(this.mockBot, this.user,
                     "budget_create", List.of(inputFormatter.formatYearMonth(currentYM), "100000", "90000"));
             this.botHandler.handleCommand(command, session);

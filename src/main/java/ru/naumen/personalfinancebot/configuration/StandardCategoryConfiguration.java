@@ -1,8 +1,8 @@
 package ru.naumen.personalfinancebot.configuration;
 
 import org.yaml.snakeyaml.Yaml;
-import ru.naumen.personalfinancebot.model.Category;
 import ru.naumen.personalfinancebot.model.CategoryType;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class StandardCategoryConfiguration {
     /**
      * Хранит список категорий
      */
-    private final List<Category> categories;
+    private final List<CategoryComponent> categories;
 
     private StandardCategoryConfiguration() {
         this.categories = parseCategories();
@@ -45,28 +45,30 @@ public class StandardCategoryConfiguration {
     /**
      * Возвращает неизменяемый список стандартных категорий
      */
-    public List<Category> getStandardCategories() {
+    public List<CategoryComponent> getStandardCategories() {
         return Collections.unmodifiableList(this.categories);
     }
 
     /**
      * Парсит стандартные категории из файла
      */
-    private List<Category> parseCategories() {
+    private List<CategoryComponent> parseCategories() {
         Map<String, Object> categoryTypesMap;
 
         try (InputStream inputStream = getConfigInputStream()) {
             Yaml yaml = new Yaml();
             Map<String, Object> yamlContent = yaml.load(inputStream);
+
             categoryTypesMap = (Map<String, Object>) yamlContent.get("standard_categories");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        List<String> expenseCategoryNames = (List<String>) categoryTypesMap.get("expense");
-        List<String> incomeCategoryNames = (List<String>) categoryTypesMap.get("income");
-        List<Category> expenseCategories = getCategoryList(CategoryType.EXPENSE, expenseCategoryNames);
-        List<Category> incomeCategories = getCategoryList(CategoryType.INCOME, incomeCategoryNames);
+        List<String> expenseCategoryPaths = (List<String>) categoryTypesMap.get("expense");
+        List<String> incomeCategoryPath = (List<String>) categoryTypesMap.get("income");
+
+        List<CategoryComponent> expenseCategories = getCategoryList(CategoryType.EXPENSE, expenseCategoryPaths);
+        List<CategoryComponent> incomeCategories = getCategoryList(CategoryType.INCOME, incomeCategoryPath);
         return Stream.concat(expenseCategories.stream(), incomeCategories.stream()).toList();
     }
 
@@ -74,13 +76,15 @@ public class StandardCategoryConfiguration {
      * Создает список категорий
      *
      * @param type          Тип категории
-     * @param categoryNames Названия для новых категорий
+     * @param categoryPaths Названия для новых категорий
      * @return Список категорий типа type и переданными названиями
      */
-    private List<Category> getCategoryList(CategoryType type, List<String> categoryNames) {
-        return categoryNames.stream()
-                .map(name -> new Category(null, name, type))
-                .toList();
+    private List<CategoryComponent> getCategoryList(CategoryType type, List<String> categoryPaths) {
+//        return categoryPaths.stream()
+//                .map(name -> new CategoryRow(null, name, type))
+//                .toList();
+        // TODO
+        return null;
     }
 
     /**

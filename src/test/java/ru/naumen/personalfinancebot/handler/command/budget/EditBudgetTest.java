@@ -11,7 +11,7 @@ import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
 import ru.naumen.personalfinancebot.model.Budget;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.ClearQueryManager;
@@ -113,7 +113,7 @@ public class EditBudgetTest {
     @After
     public void clearRepositories() {
         this.transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Budget.class, Operation.class, Category.class, User.class);
+            new ClearQueryManager().clear(session, Budget.class, Operation.class, CategoryRow.class, User.class);
         });
     }
 

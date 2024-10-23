@@ -11,7 +11,7 @@ import ru.naumen.personalfinancebot.bot.MockMessage;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.ClearQueryManager;
@@ -102,7 +102,7 @@ public class CategoryListTest {
     @After
     public void afterEachTest() {
         transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Category.class, User.class);
+            new ClearQueryManager().clear(session, CategoryRow.class, User.class);
         });
     }
 

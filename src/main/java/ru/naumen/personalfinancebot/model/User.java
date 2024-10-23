@@ -41,7 +41,7 @@ public class User {
      * Отношение: Категории, который добавил пользователь
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Category> categories;
+    private List<CategoryRow> categories;
 
     public User(long chatId, double balance) {
         this.chatId = chatId;

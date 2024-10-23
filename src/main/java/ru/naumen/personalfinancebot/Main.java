@@ -10,17 +10,13 @@ import ru.naumen.personalfinancebot.configuration.TelegramBotConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.mode.FormatMode;
 import ru.naumen.personalfinancebot.mode.NormalFormatMode;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 import ru.naumen.personalfinancebot.repository.HibernateRepositoryFactory;
 import ru.naumen.personalfinancebot.repository.RepositoryFactory;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
-import ru.naumen.personalfinancebot.repository.budget.HibernateBudgetRepository;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
-import ru.naumen.personalfinancebot.repository.category.HibernateCategoryRepository;
-import ru.naumen.personalfinancebot.repository.operation.HibernateOperationRepository;
 import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
-import ru.naumen.personalfinancebot.repository.user.HibernateUserRepository;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 
 import java.util.List;
@@ -37,7 +33,7 @@ public class Main {
         SessionFactory sessionFactory = hibernateConfiguration.getSessionFactory();
         TransactionManager transactionManager = new TransactionManager(sessionFactory);
 
-        List<Category> standardCategories = StandardCategoryConfiguration
+        List<CategoryComponent> standardCategories = StandardCategoryConfiguration
                 .getInstance()
                 .getStandardCategories();
 

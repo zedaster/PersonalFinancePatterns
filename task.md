@@ -59,6 +59,12 @@ TelegramBot является адаптером, т.к.:
 (для Дискорда, ВК и т.д.) или новый режим форматирования, то наличие 2 иерархий позволит добавлять лишь один класс 
 вместо множества.
 
+## Задание 10. Composite
+Пакет: model/category [(ссылка)](src/main/java/ru/naumen/personalfinancebot/model/category)
+
+### Причины реализации паттерна
+* Необходимость добавление одной функциональности для множества классов одного семейства.
+
 ## Задание 11. Decorator
 Класс: LoggingDecorator [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/LoggingDecorator.java)
 

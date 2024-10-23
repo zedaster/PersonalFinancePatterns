@@ -4,9 +4,10 @@ import com.sun.istack.NotNull;
 import com.sun.istack.Nullable;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.*;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
 import ru.naumen.personalfinancebot.repository.category.exception.ExistingStandardCategoryException;
 import ru.naumen.personalfinancebot.repository.category.exception.ExistingUserCategoryException;
@@ -38,73 +39,97 @@ public class HibernateCategoryRepository implements CategoryRepository {
      * @param transactionManager Нужен для открытия транзакции на добавление категорий
      * @param categories         Список стандартных категорий.
      */
-    public HibernateCategoryRepository(TransactionManager transactionManager, List<Category> categories) {
+    public HibernateCategoryRepository(TransactionManager transactionManager, List<CategoryComponent> categories) {
         transactionManager.produceTransaction(session -> {
-            for (Category category : categories) {
-                try {
-                    this.createStandardCategory(session, category.getType(), category.getCategoryName());
-                } catch (ExistingStandardCategoryException ignored) {
-                    // Игнорировано, потому что все хорошо, когда категории уже добавлены
-                }
+            for (CategoryComponent category : categories) {
+                this.saveCategoryComponentIfNotExists(session, category);
             }
         });
     }
 
+    private void saveCategoryComponentIfNotExists(Session session, CategoryComponent category) {
+        saveCategoryComponentIfNotExists(session, category, "");
+    }
+
+    private void saveCategoryComponentIfNotExists(Session session, CategoryComponent category, String lastPath) {
+        String currentPath;
+        if (lastPath.isEmpty()) {
+            currentPath = category.getName();
+        } else {
+            currentPath = lastPath + "/" + category.getName();
+        }
+
+        if (category instanceof StandardCategory standardCategory) {
+            CategoryRow categoryRow = new CategoryRow(null, currentPath, standardCategory.getType());
+            Optional<CategoryComponent> existingCategory = this.getStandardCategoryByName(session, categoryRow.getType(),
+                    categoryRow.getCategoryName());
+            if (existingCategory.isEmpty()) {
+                session.save(categoryRow);
+            }
+        } else if (category instanceof CategoryGroup) {
+            category.children().forEach(child -> saveCategoryComponentIfNotExists(session, child, currentPath));
+        }
+    }
+
     @Override
-    public List<Category> getUserCategoriesByType(Session session, @NotNull User user, CategoryType type) {
+    public List<CategoryComponent> getUserCategoriesByType(Session session, @NotNull User user, CategoryType type) {
         return getCategoriesByType(session, user, type);
     }
 
     @Override
-    public List<Category> getStandardCategoriesByType(Session session, CategoryType type) {
+    public List<CategoryComponent> getStandardCategoriesByType(Session session, CategoryType type) {
         return getCategoriesByType(session, null, type);
     }
 
     @Override
-    public Category createUserCategory(Session session, User user, CategoryType type, String categoryName) throws
+    public UserCategory createUserCategory(Session session, User user, CategoryType type, String categoryName) throws
             ExistingStandardCategoryException, ExistingUserCategoryException {
-        Optional<Category> existingUserCategory = this.getCategoryByName(session, user, type, categoryName);
+        Optional<CategoryComponent> existingUserCategory = this.getCategoryByName(session, user, type, categoryName);
 
         if (existingUserCategory.isPresent()) {
-            if (existingUserCategory.get().isStandard()) {
+            if (existingUserCategory.get() instanceof StandardCategory) {
                 throw new ExistingStandardCategoryException(categoryName);
             } else {
                 throw new ExistingUserCategoryException(categoryName);
             }
         }
 
-        Category category = new Category();
-        category.setCategoryName(categoryName);
-        category.setType(type);
-        category.setUser(user);
-        return createCategory(session, category);
+        CategoryRow categoryRow = new CategoryRow();
+        categoryRow.setCategoryName(categoryName);
+        categoryRow.setType(type);
+        categoryRow.setUser(user);
+        createCategory(session, categoryRow);
+
+        return new UserCategory(categoryName, type, user);
     }
 
     @Override
-    public Category createStandardCategory(Session session, CategoryType type, String categoryName)
+    public StandardCategory createStandardCategory(Session session, CategoryType type, String categoryName)
             throws ExistingStandardCategoryException {
         if (this.getStandardCategoryByName(session, type, categoryName).isPresent()) {
             throw new ExistingStandardCategoryException(categoryName);
         }
 
-        Category category = new Category();
-        category.setCategoryName(categoryName);
-        category.setType(type);
-        return createCategory(session, category);
+        CategoryRow categoryRow = new CategoryRow();
+        categoryRow.setCategoryName(categoryName);
+        categoryRow.setType(type);
+        createCategory(session, categoryRow);
+
+        return new StandardCategory(categoryName, type);
     }
 
     public void removeUserCategoryByName(Session session, User user, CategoryType type, String categoryName)
             throws NotExistingCategoryException {
-        Optional<Category> category = getCategoryByName(session, user, type, categoryName);
-        if (category.isEmpty() || category.get().isStandard()) {
+        Optional<CategoryComponent> category = getCategoryByName(session, user, type, categoryName);
+        if (category.isEmpty() || category.get() instanceof StandardCategory) {
             throw new NotExistingCategoryException(categoryName);
         }
         session.delete(category.get());
     }
 
     @Override
-    public Optional<Category> getCategoryByName(Session session, @Nullable User user, CategoryType type, String categoryName) {
-        Query<Category> resultQuery;
+    public Optional<CategoryComponent> getCategoryByName(Session session, @Nullable User user, CategoryType type, String categoryName) {
+        Query<CategoryRow> resultQuery;
 
         if (user == null) {
             resultQuery = selectCategoriesSeparately(session, type, null, categoryName);
@@ -112,18 +137,36 @@ public class HibernateCategoryRepository implements CategoryRepository {
             resultQuery = selectCategoriesTogether(session, type, user, categoryName);
         }
 
-        return resultQuery
+        Optional<CategoryRow> categoryRow = resultQuery
                 .getResultStream()
                 .findFirst();
+
+        if (categoryRow.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (user == null) {
+            return Optional.of(new StandardCategory(categoryRow.get().getCategoryName(), categoryRow.get().getType()));
+        }
+
+        return Optional.of(new UserCategory(categoryRow.get().getCategoryName(), categoryRow.get().getType(), user));
     }
 
     /**
      * Получает либо пользовательские, либо стандартные (при user = null) категории определенного типа.
      * Регистр названия категории игнорируется.
      */
-    private List<Category> getCategoriesByType(Session session, @Nullable User user, CategoryType type) {
-        Query<Category> query = selectCategoriesSeparately(session, type, user, null);
-        return query.getResultList();
+    private List<CategoryComponent> getCategoriesByType(Session session, @Nullable User user, CategoryType type) {
+        Query<CategoryRow> query = selectCategoriesSeparately(session, type, user, null);
+        if (user == null) {
+            return query.getResultStream()
+                    .map(row -> (CategoryComponent) new StandardCategory(row.getCategoryName(), row.getType()))
+                    .toList();
+        }
+
+        return query.getResultStream()
+                .map(row -> (CategoryComponent) new UserCategory(row.getCategoryName(), row.getType(), user))
+                .toList();
     }
 
     /**
@@ -131,11 +174,11 @@ public class HibernateCategoryRepository implements CategoryRepository {
      * <b>или</b> персональные категории в ином случае.
      * Регистр названия категории при выборке игнорируется.
      */
-    private Query<Category> selectCategoriesSeparately(Session session, CategoryType type, @Nullable User user,
-                                                       @Nullable String categoryName) {
+    private Query<CategoryRow> selectCategoriesSeparately(Session session, CategoryType type, @Nullable User user,
+                                                          @Nullable String categoryName) {
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Category> cq = cb.createQuery(Category.class);
-        Root<Category> root = cq.from(Category.class);
+        CriteriaQuery<CategoryRow> cq = cb.createQuery(CategoryRow.class);
+        Root<CategoryRow> root = cq.from(CategoryRow.class);
 
         List<Predicate> selectPredicates = new ArrayList<>();
 
@@ -165,10 +208,10 @@ public class HibernateCategoryRepository implements CategoryRepository {
      * <b>и</b> персональные категории.
      * Регистр названия категории при выборке игнорируется.
      */
-    private Query<Category> selectCategoriesTogether(Session session, CategoryType type, User user, String categoryName) {
+    private Query<CategoryRow> selectCategoriesTogether(Session session, CategoryType type, User user, String categoryName) {
         CriteriaBuilder cb = session.getCriteriaBuilder();
-        CriteriaQuery<Category> cq = cb.createQuery(Category.class);
-        Root<Category> root = cq.from(Category.class);
+        CriteriaQuery<CategoryRow> cq = cb.createQuery(CategoryRow.class);
+        Root<CategoryRow> root = cq.from(CategoryRow.class);
 
         cq.select(root).where(cb.and(
                 cb.or(
@@ -185,11 +228,11 @@ public class HibernateCategoryRepository implements CategoryRepository {
     /**
      * Делегирующий метод для создания записи категории в базе данных
      *
-     * @param category Категория
+     * @param categoryRow Категория
      * @return Категория
      */
-    private Category createCategory(Session session, Category category) {
-        session.save(category);
-        return category;
+    private CategoryRow createCategory(Session session, CategoryRow categoryRow) {
+        session.save(categoryRow);
+        return categoryRow;
     }
 }

@@ -1,10 +1,11 @@
 package ru.naumen.personalfinancebot.repository.operation;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -19,8 +20,9 @@ import java.util.Map;
 public class HibernateOperationRepository implements OperationRepository {
 
     @Override
-    public Operation addOperation(Session session, User user, Category category, double payment) {
-        Operation operation = new Operation(user, category, payment);
+    public Operation addOperation(Session session, User user, CategoryComponent categoryComponent, double payment) {
+        // TODO get category row from category repository
+        Operation operation = new Operation(user, null, payment);
         session.save(operation);
         return operation;
     }
@@ -32,11 +34,11 @@ public class HibernateOperationRepository implements OperationRepository {
 
         final String hql = "SELECT cat.categoryName, sum (operation.payment) " +
                 "FROM Operation operation " +
-                "LEFT JOIN operation.category cat on cat.id = operation.category.id " +
+                "LEFT JOIN operation.categoryRow cat on cat.id = operation.categoryRow.id " +
                 "WHERE cat.type = :categoryType " +
                 "AND (operation.user = :user OR operation.user = NULL) " +
                 "AND operation.createdAt BETWEEN :startDate AND :endDate " +
-                "GROUP BY operation.category.id, cat.id";
+                "GROUP BY operation.categoryRow.id, cat.id";
 
         List<?> operations = session.createQuery(hql)
                 .setParameter("categoryType", type)
@@ -50,9 +52,9 @@ public class HibernateOperationRepository implements OperationRepository {
         Map<String, Double> result = new LinkedHashMap<>();
         for (Object operation : operations) {
             Object[] row = (Object[]) operation;
-            String category = (String) row[0];
+            String categoryRow = (String) row[0];
             Double payment = (Double) row[1];
-            result.put(category, payment);
+            result.put(categoryRow, payment);
         }
         return result;
     }
@@ -62,7 +64,7 @@ public class HibernateOperationRepository implements OperationRepository {
         LocalDate startDate = LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
         String hql = "SELECT sum(op.payment) from Operation op "
-                + "LEFT JOIN Category cat on cat.id = op.category.id "
+                + "LEFT JOIN CategoryRow cat on cat.id = op.categoryRow.id "
                 + "WHERE op.user = :user "
                 + "AND cat.type = :type "
                 + "AND op.createdAt BETWEEN :startDate AND :endDate";
@@ -87,7 +89,7 @@ public class HibernateOperationRepository implements OperationRepository {
 //            String hql = "SELECT paymentSums.type, avg(paymentSums.payments) FROM "
 //                    + "(SELECT categories.type AS type, sum(operations.payment) AS payments "
 //                    + "FROM Operation operations "
-//                    + "JOIN operations.category categories "
+//                    + "JOIN operations.categoryRow categories "
 //                    + "WHERE year(operations.createdAt) = :year "
 //                    + "AND month(operations.createdAt) = :month "
 //                    + "GROUP BY operations.user, categories.type) AS paymentSums "
@@ -97,7 +99,7 @@ public class HibernateOperationRepository implements OperationRepository {
 
         String hql = "SELECT categories.type, sum(operations.payment) AS payments "
                 + "FROM Operation operations "
-                + "JOIN operations.category categories "
+                + "JOIN operations.categoryRow categories "
                 + "WHERE year(operations.createdAt) = :year "
                 + "AND month(operations.createdAt) = :month "
                 + "GROUP BY operations.user, categories.type";
@@ -118,12 +120,12 @@ public class HibernateOperationRepository implements OperationRepository {
     public Map<String, Double> getAverageSummaryByStandardCategory(Session session, YearMonth yearMonth) {
         String averagePaymentHQL = """
                 select categories.categoryName, sum(operations.payment) from Operation operations
-                join operations.category categories
+                join operations.categoryRow categories
                 where year(operations.createdAt) = :year
                 and month(operations.createdAt) = :month
                 and categories.user is null
-                group by operations.user, operations.category.categoryName
-                order by operations.category.categoryName asc
+                group by operations.user, operations.categoryRow.categoryName
+                order by operations.categoryRow.categoryName asc
                 """;
         List<?> result = session.createQuery(averagePaymentHQL)
                 .setParameter("month", yearMonth.getMonth().getValue())

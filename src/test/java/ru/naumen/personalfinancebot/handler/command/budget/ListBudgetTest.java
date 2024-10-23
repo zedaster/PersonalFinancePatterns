@@ -72,12 +72,12 @@ public class ListBudgetTest {
     /**
      * Фейковая категория для доходов
      */
-    private Category fakeIncomeCategory;
+    private CategoryRow fakeIncomeCategoryRow;
 
     /**
      * Фейковая категория для расходов
      */
-    private Category fakeExpenseCategory;
+    private CategoryRow fakeExpenseCategoryRow;
 
     /**
      * Экземпляр класс фейковой реализации бота
@@ -113,11 +113,11 @@ public class ListBudgetTest {
         this.transactionManager.produceTransaction(session -> {
             this.userRepository.saveUser(session, this.user);
             try {
-                this.fakeIncomeCategory = this.categoryRepository.createStandardCategory(
+                this.fakeIncomeCategoryRow = this.categoryRepository.createStandardCategory(
                         session,
                         CategoryType.INCOME,
                         "Fake Income");
-                this.fakeExpenseCategory = this.categoryRepository.createStandardCategory(
+                this.fakeExpenseCategoryRow = this.categoryRepository.createStandardCategory(
                         session,
                         CategoryType.EXPENSE,
                         "Fake Expense");
@@ -133,7 +133,7 @@ public class ListBudgetTest {
     @After
     public void clearRepositories() {
         this.transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Budget.class, Operation.class, Category.class, User.class);
+            new ClearQueryManager().clear(session, Budget.class, Operation.class, CategoryRow.class, User.class);
         });
     }
 
@@ -165,13 +165,13 @@ public class ListBudgetTest {
             this.budgetRepository.saveBudget(session, new Budget(user, 100_000, 90_000, minusOneMonthYM));
             this.budgetRepository.saveBudget(session, new Budget(user, 80_000, 70_000, currentYM));
 
-            this.operationRepository.addOperation(session, user, fakeIncomeCategory, 9000,
+            this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 9000,
                     minusOneMonthYM.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeExpenseCategory, 8000,
+            this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 8000,
                     minusOneMonthYM.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeIncomeCategory, 7000,
+            this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 7000,
                     currentYM.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeExpenseCategory, 6000,
+            this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 6000,
                     currentYM.atDay(1));
 
             CommandData command = new CommandData(this.mockBot, this.user, "budget_list", List.of());
@@ -268,9 +268,9 @@ public class ListBudgetTest {
             for (int i = 13; i >= 0; i--) {
                 YearMonth testYM = YearMonth.now().minusMonths(i);
                 this.budgetRepository.saveBudget(session, new Budget(user, 100_000, 90_000, testYM));
-                this.operationRepository.addOperation(session, user, fakeIncomeCategory, 9000,
+                this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 9000,
                         testYM.atDay(1));
-                this.operationRepository.addOperation(session, user, fakeExpenseCategory, 8000,
+                this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 8000,
                         testYM.atDay(1));
                 if (i != 13) {
                     argsToReplace.add(monthFormatter.formatRuMonthName(testYM.getMonth()));
@@ -299,13 +299,13 @@ public class ListBudgetTest {
             this.budgetRepository.saveBudget(session, new Budget(user, 100_000, 90_000, ymJan2022));
             this.budgetRepository.saveBudget(session, new Budget(user, 80_000, 70_000, ymFeb2022));
 
-            this.operationRepository.addOperation(session, user, fakeIncomeCategory, 9000,
+            this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 9000,
                     ymJan2022.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeExpenseCategory, 8000,
+            this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 8000,
                     ymJan2022.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeIncomeCategory, 7000,
+            this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 7000,
                     ymFeb2022.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeExpenseCategory, 6000,
+            this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 6000,
                     ymFeb2022.atDay(1));
 
             CommandData command = new CommandData(this.mockBot, this.user, "budget_list", List.of("2022"));
@@ -356,9 +356,9 @@ public class ListBudgetTest {
             for (int i = 0; i < 4; i++) {
                 YearMonth testYM = nov22ym.plusMonths(i);
                 this.budgetRepository.saveBudget(session, new Budget(user, 100_000, 90_000, testYM));
-                this.operationRepository.addOperation(session, user, fakeIncomeCategory, 9000,
+                this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 9000,
                         testYM.atDay(1));
-                this.operationRepository.addOperation(session, user, fakeExpenseCategory, 8000,
+                this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 8000,
                         testYM.atDay(1));
             }
 
@@ -437,9 +437,9 @@ public class ListBudgetTest {
         transactionManager.produceTransaction(session -> {
             YearMonth testYM = YearMonth.of(2022, 12);
             this.budgetRepository.saveBudget(session, new Budget(user, 100_000, 90_000, testYM));
-            this.operationRepository.addOperation(session, user, fakeIncomeCategory, 101_000,
+            this.operationRepository.addOperation(session, user, fakeIncomeCategoryRow, 101_000,
                     testYM.atDay(1));
-            this.operationRepository.addOperation(session, user, fakeExpenseCategory, 91_000,
+            this.operationRepository.addOperation(session, user, fakeExpenseCategoryRow, 91_000,
                     testYM.atDay(1));
 
             CommandData command = new CommandData(this.mockBot, this.user, "budget_list",

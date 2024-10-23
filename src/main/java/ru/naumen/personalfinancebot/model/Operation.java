@@ -30,7 +30,7 @@ public class Operation {
      */
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private Category category;
+    private CategoryRow categoryRow;
 
     /**
      * Сумма расхода/дохода
@@ -44,16 +44,16 @@ public class Operation {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    public Operation(User user, Category category, double payment) {
+    public Operation(User user, CategoryRow categoryRow, double payment) {
         this.user = user;
-        this.category = category;
+        this.categoryRow = categoryRow;
         this.payment = payment;
         this.createdAt = LocalDate.now();
     }
 
-    public Operation(User user, Category category, double payment, LocalDate createdAt) {
+    public Operation(User user, CategoryRow categoryRow, double payment, LocalDate createdAt) {
         this.user = user;
-        this.category = category;
+        this.categoryRow = categoryRow;
         this.payment = payment;
         this.createdAt = createdAt;
     }
@@ -79,15 +79,15 @@ public class Operation {
     /**
      * @return ID категории расхода/дохода
      */
-    public Category getCategory() {
-        return category;
+    public CategoryRow getCategory() {
+        return categoryRow;
     }
 
     /**
-     * @param category ID категории расхода/дохода
+     * @param categoryRow ID категории расхода/дохода
      */
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategory(CategoryRow categoryRow) {
+        this.categoryRow = categoryRow;
     }
 
     /**

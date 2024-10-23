@@ -9,7 +9,7 @@ import ru.naumen.personalfinancebot.bot.MockMessage;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
@@ -41,7 +41,7 @@ public class AverageReportHandlerTest {
     private final LocalDate date = LocalDate.of(2023, 12, 1);
 
     /**
-     * Репозиторий для работы с {@link Category}
+     * Репозиторий для работы с {@link CategoryRow}
      */
     private final CategoryRepository categoryRepository;
 
@@ -78,17 +78,17 @@ public class AverageReportHandlerTest {
     /**
      * Стандартная Категория доходов "Зарлпта"
      */
-    private Category salaryCategory;
+    private CategoryRow salaryCategoryRow;
 
     /**
      * Стандартная Категория расходов "Супермаркеты"
      */
-    private Category shopsCategory;
+    private CategoryRow shopsCategoryRow;
 
     /**
      * Стандартная Категория расходов "Рестораны и кафе"
      */
-    private Category restaurantCategory;
+    private CategoryRow restaurantCategoryRow;
 
     public AverageReportHandlerTest() {
         this.transactionManager = new TransactionManager(new HibernateConfiguration().getSessionFactory());
@@ -109,11 +109,11 @@ public class AverageReportHandlerTest {
         this.bot = new MockBot();
         transactionManager.produceTransaction(session -> {
             try {
-                this.salaryCategory = this.categoryRepository.createStandardCategory(
+                this.salaryCategoryRow = this.categoryRepository.createStandardCategory(
                         session, CategoryType.INCOME, "Зарплата");
-                this.shopsCategory = this.categoryRepository.createStandardCategory(
+                this.shopsCategoryRow = this.categoryRepository.createStandardCategory(
                         session, CategoryType.EXPENSE, "Супермаркеты");
-                this.restaurantCategory = this.categoryRepository.createStandardCategory(
+                this.restaurantCategoryRow = this.categoryRepository.createStandardCategory(
                         session, CategoryType.EXPENSE, "Рестораны и кафе");
             } catch (ExistingStandardCategoryException e) {
                 throw new RuntimeException(e);
@@ -127,7 +127,7 @@ public class AverageReportHandlerTest {
     @After
     public void clean() {
         transactionManager.produceTransaction(session -> this.clearQueryManager.clear(
-                session, Operation.class, User.class, Category.class));
+                session, Operation.class, User.class, CategoryRow.class));
     }
 
     /**
@@ -139,12 +139,12 @@ public class AverageReportHandlerTest {
             User user1 = new User(1L, 100000);
             this.userRepository.saveUser(session, user1);
 
-            this.operationRepository.addOperation(session, user1, shopsCategory, 200, date);
-            this.operationRepository.addOperation(session, user1, shopsCategory, 500, date);
-            this.operationRepository.addOperation(session, user1, restaurantCategory, 1000, date);
-            this.operationRepository.addOperation(session, user1, restaurantCategory, 2000, date);
-            this.operationRepository.addOperation(session, user1, salaryCategory, 60_000, date);
-            this.operationRepository.addOperation(session, user1, salaryCategory, 20_000, date);
+            this.operationRepository.addOperation(session, user1, shopsCategoryRow, 200, date);
+            this.operationRepository.addOperation(session, user1, shopsCategoryRow, 500, date);
+            this.operationRepository.addOperation(session, user1, restaurantCategoryRow, 1000, date);
+            this.operationRepository.addOperation(session, user1, restaurantCategoryRow, 2000, date);
+            this.operationRepository.addOperation(session, user1, salaryCategoryRow, 60_000, date);
+            this.operationRepository.addOperation(session, user1, salaryCategoryRow, 20_000, date);
             CommandData data = new CommandData(this.bot, user1, COMMAND, List.of("12.2023"));
 
             this.financeBotHandler.handleCommand(data, session);
@@ -171,19 +171,19 @@ public class AverageReportHandlerTest {
             this.userRepository.saveUser(session, user1);
             this.userRepository.saveUser(session, user2);
 
-            this.operationRepository.addOperation(session, user1, shopsCategory, 200);
-            this.operationRepository.addOperation(session, user1, shopsCategory, 500);
-            this.operationRepository.addOperation(session, user1, restaurantCategory, 1000);
-            this.operationRepository.addOperation(session, user1, restaurantCategory, 2000);
-            this.operationRepository.addOperation(session, user1, salaryCategory, 60_000);
-            this.operationRepository.addOperation(session, user1, salaryCategory, 20_000);
+            this.operationRepository.addOperation(session, user1, shopsCategoryRow, 200);
+            this.operationRepository.addOperation(session, user1, shopsCategoryRow, 500);
+            this.operationRepository.addOperation(session, user1, restaurantCategoryRow, 1000);
+            this.operationRepository.addOperation(session, user1, restaurantCategoryRow, 2000);
+            this.operationRepository.addOperation(session, user1, salaryCategoryRow, 60_000);
+            this.operationRepository.addOperation(session, user1, salaryCategoryRow, 20_000);
 
-            this.operationRepository.addOperation(session, user2, shopsCategory, 500);
-            this.operationRepository.addOperation(session, user2, shopsCategory, 700);
-            this.operationRepository.addOperation(session, user2, restaurantCategory, 400);
-            this.operationRepository.addOperation(session, user2, restaurantCategory, 700);
-            this.operationRepository.addOperation(session, user2, salaryCategory, 40_000);
-            this.operationRepository.addOperation(session, user2, salaryCategory, 15_000);
+            this.operationRepository.addOperation(session, user2, shopsCategoryRow, 500);
+            this.operationRepository.addOperation(session, user2, shopsCategoryRow, 700);
+            this.operationRepository.addOperation(session, user2, restaurantCategoryRow, 400);
+            this.operationRepository.addOperation(session, user2, restaurantCategoryRow, 700);
+            this.operationRepository.addOperation(session, user2, salaryCategoryRow, 40_000);
+            this.operationRepository.addOperation(session, user2, salaryCategoryRow, 15_000);
 
             CommandData data = new CommandData(this.bot, user1, COMMAND, List.of("12.2023"));
 

@@ -1,6 +1,6 @@
 package ru.naumen.personalfinancebot.repository;
 
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
 import ru.naumen.personalfinancebot.repository.budget.HibernateBudgetRepository;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
@@ -37,7 +37,7 @@ public class HibernateRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public CategoryRepository newCategoryRepository(List<Category> standardCategories) {
+    public CategoryRepository newCategoryRepository(List<CategoryComponent> standardCategories) {
         return new HibernateCategoryRepository(transactionManager, standardCategories);
     }
 

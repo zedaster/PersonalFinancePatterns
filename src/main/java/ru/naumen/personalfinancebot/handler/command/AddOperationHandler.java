@@ -3,10 +3,11 @@ package ru.naumen.personalfinancebot.handler.command;
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 import ru.naumen.personalfinancebot.repository.category.exception.NotExistingCategoryException;
 import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
@@ -134,7 +135,7 @@ public class AddOperationHandler implements CommandHandler {
         } else if (type == CategoryType.INCOME) {
             payment = Math.abs(payment);
         }
-        Optional<Category> category = this.categoryRepository.getCategoryByName(session, user, type, categoryName);
+        Optional<CategoryComponent> category = this.categoryRepository.getCategoryByName(session, user, type, categoryName);
         if (category.isEmpty()) {
             throw new NotExistingCategoryException(categoryName);
         }

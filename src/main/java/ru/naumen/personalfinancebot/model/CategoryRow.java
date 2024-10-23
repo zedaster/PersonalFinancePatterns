@@ -1,7 +1,6 @@
 package ru.naumen.personalfinancebot.model;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -9,7 +8,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "categories")
-public class Category {
+public class CategoryRow {
     /**
      * ID категории
      */
@@ -26,12 +25,6 @@ public class Category {
     private User user;
 
     /**
-     * Отношение: Операции, связанные с этой категорией
-     */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Operation> operations;
-
-    /**
      * Название категории.
      */
     @Column(name = "category_name", nullable = false)
@@ -45,11 +38,11 @@ public class Category {
     @Column(name = "type", nullable = false)
     private CategoryType type;
 
-    public Category() {
+    public CategoryRow() {
 
     }
 
-    public Category(User user, String categoryName, CategoryType type) {
+    public CategoryRow(User user, String categoryName, CategoryType type) {
         this.user = user;
         this.categoryName = categoryName;
         this.type = type;
@@ -115,8 +108,8 @@ public class Category {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Category category = (Category) o;
-        return id == category.id;
+        CategoryRow categoryRow = (CategoryRow) o;
+        return id == categoryRow.id;
     }
 
     @Override

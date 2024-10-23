@@ -10,7 +10,7 @@ import ru.naumen.personalfinancebot.bot.MockBot;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.Operation;
 import ru.naumen.personalfinancebot.model.User;
@@ -73,12 +73,12 @@ public class EstimateReportTest {
     /**
      * Тестовая стандартная категория дохода
      */
-    private Category testStandartIncomeCategory;
+    private CategoryRow testStandartIncomeCategoryRow;
 
     /**
      * Тестовая стандартная категория расхода
      */
-    private Category testStandartExpsenseCategory;
+    private CategoryRow testStandartExpsenseCategoryRow;
 
     /**
      * Тестовый пользователь
@@ -107,9 +107,9 @@ public class EstimateReportTest {
         this.mockBot = new MockBot();
         transactionManager.produceTransaction(session -> {
             try {
-                this.testStandartIncomeCategory = this.categoryRepository
+                this.testStandartIncomeCategoryRow = this.categoryRepository
                         .createStandardCategory(session, CategoryType.INCOME, "Test income");
-                this.testStandartExpsenseCategory = this.categoryRepository
+                this.testStandartExpsenseCategoryRow = this.categoryRepository
                         .createStandardCategory(session, CategoryType.EXPENSE, "Test expense");
             } catch (ExistingStandardCategoryException e) {
                 throw new RuntimeException(e);
@@ -125,7 +125,7 @@ public class EstimateReportTest {
     @After
     public void afterEach() {
         transactionManager.produceTransaction(session -> {
-            new ClearQueryManager().clear(session, Operation.class, Category.class, User.class);
+            new ClearQueryManager().clear(session, Operation.class, CategoryRow.class, User.class);
         });
     }
 
@@ -140,13 +140,13 @@ public class EstimateReportTest {
                 Доходы: 90 000""";
 
         transactionManager.produceTransaction(session -> {
-            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategory, 20_000);
-            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategory, 30_000);
-            this.operationRepository.addOperation(session, this.testUser, this.testStandartIncomeCategory, 80_000);
+            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategoryRow, 20_000);
+            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategoryRow, 30_000);
+            this.operationRepository.addOperation(session, this.testUser, this.testStandartIncomeCategoryRow, 80_000);
 
             User secondUser = createUser(session, 2);
-            this.operationRepository.addOperation(session, secondUser, this.testStandartExpsenseCategory, 70_000);
-            this.operationRepository.addOperation(session, secondUser, this.testStandartIncomeCategory, 100_000);
+            this.operationRepository.addOperation(session, secondUser, this.testStandartExpsenseCategoryRow, 70_000);
+            this.operationRepository.addOperation(session, secondUser, this.testStandartIncomeCategoryRow, 100_000);
 
             CommandData commandData = new CommandData(this.mockBot, this.testUser, COMMAND_NAME, List.of());
             botHandler.handleCommand(commandData, session);
@@ -202,15 +202,15 @@ public class EstimateReportTest {
         final LocalDate createDate = YearMonth.of(2023, 10).atDay(1);
 
         transactionManager.produceTransaction(session -> {
-            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategory,
+            this.operationRepository.addOperation(session, this.testUser, this.testStandartExpsenseCategoryRow,
                     80_000, createDate);
-            this.operationRepository.addOperation(session, this.testUser, this.testStandartIncomeCategory,
+            this.operationRepository.addOperation(session, this.testUser, this.testStandartIncomeCategoryRow,
                     90_000, createDate);
 
             User secondUser = createUser(session, 2);
-            this.operationRepository.addOperation(session, secondUser, this.testStandartExpsenseCategory,
+            this.operationRepository.addOperation(session, secondUser, this.testStandartExpsenseCategoryRow,
                     60_000, createDate);
-            this.operationRepository.addOperation(session, secondUser, this.testStandartIncomeCategory,
+            this.operationRepository.addOperation(session, secondUser, this.testStandartIncomeCategoryRow,
                     110_000, createDate);
 
             CommandData commandData = new CommandData(this.mockBot, this.testUser, COMMAND_NAME,
@@ -235,7 +235,7 @@ public class EstimateReportTest {
 
         transactionManager.produceTransaction(session -> {
             this.operationRepository.addOperation(session, this.testUser,
-                    this.testStandartIncomeCategory, 50_000);
+                    this.testStandartIncomeCategoryRow, 50_000);
 
             CommandData commandData = new CommandData(this.mockBot, this.testUser, COMMAND_NAME, List.of());
             botHandler.handleCommand(commandData, session);

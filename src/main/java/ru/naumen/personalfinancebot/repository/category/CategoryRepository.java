@@ -1,9 +1,12 @@
 package ru.naumen.personalfinancebot.repository.category;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.model.Category;
+import ru.naumen.personalfinancebot.model.CategoryRow;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
+import ru.naumen.personalfinancebot.model.category.CategoryComponent;
+import ru.naumen.personalfinancebot.model.category.StandardCategory;
+import ru.naumen.personalfinancebot.model.category.UserCategory;
 import ru.naumen.personalfinancebot.repository.category.exception.ExistingStandardCategoryException;
 import ru.naumen.personalfinancebot.repository.category.exception.ExistingUserCategoryException;
 import ru.naumen.personalfinancebot.repository.category.exception.NotExistingCategoryException;
@@ -22,7 +25,7 @@ public interface CategoryRepository {
      * @param type Тип категорий
      * @return Список из запрошенных категорий
      */
-    List<Category> getUserCategoriesByType(Session session, User user, CategoryType type);
+    List<CategoryComponent> getUserCategoriesByType(Session session, User user, CategoryType type);
 
     /**
      * Возвращает стандартную категорию по имени
@@ -31,7 +34,7 @@ public interface CategoryRepository {
      * @param categoryName Имя категории
      * @return Стандартная категория
      */
-    default Optional<Category> getStandardCategoryByName(Session session, CategoryType type, String categoryName) {
+    default Optional<CategoryComponent> getStandardCategoryByName(Session session, CategoryType type, String categoryName) {
         return getCategoryByName(session, null, type, categoryName);
     }
 
@@ -41,7 +44,7 @@ public interface CategoryRepository {
      * @param type Тип категорий
      * @return Список из запрошенных категорий
      */
-    List<Category> getStandardCategoriesByType(Session session, CategoryType type);
+    List<CategoryComponent> getStandardCategoriesByType(Session session, CategoryType type);
 
     /**
      * Создаёт пользовательскую категорию
@@ -53,18 +56,18 @@ public interface CategoryRepository {
      * @throws ExistingUserCategoryException     если пользовательская категория с таким типом и именем для этого юзера уже существует
      * @throws ExistingStandardCategoryException если существует стандартная категория с таким же названием
      */
-    Category createUserCategory(Session session, User user, CategoryType type, String categoryName)
+    UserCategory createUserCategory(Session session, User user, CategoryType type, String categoryName)
             throws ExistingUserCategoryException, ExistingStandardCategoryException;
 
     /**
-     * Создаёт стандартную категорию, не относящуюся к пользователя
+     * Создаёт стандартную категорию, не относящуюся к пользователю
      *
      * @param categoryName Имя категории
      * @param type         Тип категории: расход / доход
      * @throws ExistingStandardCategoryException если стандартная категория с таким типом и именем уже существует
      * @return Созданная категория
      */
-    Category createStandardCategory(Session session, CategoryType type, String categoryName)
+    StandardCategory createStandardCategory(Session session, CategoryType type, String categoryName)
             throws ExistingStandardCategoryException;
 
     /**
@@ -83,5 +86,5 @@ public interface CategoryRepository {
      * @param type         Тип категории
      * @return Опциональный объект категории (пуст, если категория не найдена)
      */
-    Optional<Category> getCategoryByName(Session session, User user, CategoryType type, String categoryName);
+    Optional<CategoryComponent> getCategoryByName(Session session, User user, CategoryType type, String categoryName);
 }
