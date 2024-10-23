@@ -85,8 +85,8 @@ public class FinanceBotHandler {
         commandHandlers.put("budget_list", new ListBudgetHandler(budgetRepository, operationRepository,
                 dateParseService, numberFormatService, monthFormatService));
 
-        commandHandlers.put("estimate_report", new EstimateReportHandler(dateParseService, reportService));
-        commandHandlers.put("avg_report", new AverageReportHandler(dateParseService, reportService));
+        commandHandlers.put("estimate_report", new LoggingDecorator(new EstimateReportHandler(dateParseService, reportService)));
+        commandHandlers.put("avg_report", new LoggingDecorator(new AverageReportHandler(dateParseService, reportService)));
     }
 
     /**
