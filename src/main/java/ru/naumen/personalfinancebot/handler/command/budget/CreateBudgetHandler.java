@@ -3,6 +3,8 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.validator.ArgumentValidator;
+import ru.naumen.personalfinancebot.handler.validator.ArgumentValidatorException;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.model.Budget;
 import ru.naumen.personalfinancebot.model.CategoryType;
@@ -15,7 +17,6 @@ import ru.naumen.personalfinancebot.service.OutputMonthFormatService;
 import ru.naumen.personalfinancebot.service.OutputNumberFormatService;
 
 import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
 
 /**
  * Обработчик команды "/budget_create".
@@ -56,16 +57,6 @@ public class CreateBudgetHandler implements CommandHandler {
     private final OperationRepository operationRepository;
 
     /**
-     * Сервис, который парсит дату
-     */
-    private final DateParseService dateParseService;
-
-    /**
-     * Сервис, который парсит числа
-     */
-    private final NumberParseService numberParseService;
-
-    /**
      * Сервис, который форматирует числа
      */
     private final OutputNumberFormatService numberFormatService;
@@ -79,49 +70,36 @@ public class CreateBudgetHandler implements CommandHandler {
     /**
      * @param budgetRepository    Репозиторий для работы с бюджетом
      * @param operationRepository Репозиторий для работы с операциями
-     * @param dateParseService    Сервис, который парсит дату
-     * @param numberParseService  Сервис, который парсит числа
      * @param numberFormatService Сервис, который форматирует числа
      * @param monthFormatService  Сервис, который форматирует месяц к русскому названию
      */
     public CreateBudgetHandler(BudgetRepository budgetRepository, OperationRepository operationRepository,
-                               DateParseService dateParseService, NumberParseService numberParseService,
                                OutputNumberFormatService numberFormatService, OutputMonthFormatService monthFormatService) {
         this.budgetRepository = budgetRepository;
         this.operationRepository = operationRepository;
-        this.dateParseService = dateParseService;
-        this.numberParseService = numberParseService;
         this.numberFormatService = numberFormatService;
         this.monthFormatService = monthFormatService;
     }
 
     @Override
     public void handleCommand(CommandData commandData, Session session) {
-        if (commandData.getArgs().size() != 3) {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_CREATE_BUDGET_ENTIRE_ARGS);
-            return;
-        }
-
         YearMonth yearMonth;
+        double expectedIncome;
+        double expectedExpenses;
+
+        ArgumentValidator validator = new ArgumentValidator(commandData.getArgs());
         try {
-            yearMonth = this.dateParseService.parseYearMonth(commandData.getArgs().get(0));
-        } catch (DateTimeParseException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
+            validator.validateLength(3, INCORRECT_CREATE_BUDGET_ENTIRE_ARGS);
+            yearMonth = validator.parseNextValidYearMonth(Message.INCORRECT_YEAR_MONTH_FORMAT);
+            expectedIncome = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
+            expectedExpenses = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
+        } catch (ArgumentValidatorException e) {
+            commandData.getBot().sendMessage(commandData.getUser(), e.getInvalidMessage());
             return;
         }
 
         if (yearMonth.isBefore(YearMonth.now())) {
             commandData.getBot().sendMessage(commandData.getUser(), CANT_CREATE_OLD_BUDGET);
-            return;
-        }
-
-        double expectedIncome;
-        double expectedExpenses;
-        try {
-            expectedIncome = this.numberParseService.parsePositiveDouble(commandData.getArgs().get(1));
-            expectedExpenses = this.numberParseService.parsePositiveDouble(commandData.getArgs().get(2));
-        } catch (NumberFormatException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_BUDGET_NUMBER_ARG);
             return;
         }
 
