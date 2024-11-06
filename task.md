@@ -85,3 +85,13 @@ TelegramBot является адаптером, т.к.:
 ### Причины реализации паттерна
 * Оптимизация памяти. Есть задачи, которые имеют длинное описание и присваиваются нескольким пользователям одновременно.
 В таком случае разбиение задачи на Task и TaskContext помогает сократить использование памяти.
+
+## Задание 14. Proxy
+Классы: BudgetRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository/budget/BudgetRepository.java), 
+CategoryRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository/category/CategoryRepository.java),
+OperationRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository/operation/OperationRepository.java),
+UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository/user/UserRepository.java).
+
+### Признаки паттерна
+* Являются "представителями" операций с удаленными объектами в базе данных
+* В архитектуре представляют собой отдельный слой работы с базой данных в приложении
