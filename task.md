@@ -95,3 +95,11 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 ### Признаки паттерна
 * Являются "представителями" операций с удаленными объектами в базе данных
 * В архитектуре представляют собой отдельный слой работы с базой данных в приложении
+
+## Задание 15. Chain of Responsibility
+Класс: MessageBuilder [(ссылка)](src/main/java/ru/naumen/personalfinancebot/message/format/MessageBuilder.java)
+
+Пример использования: Creat [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/budget/CreateBudgetHandler.java)
+
+### Причины реализации паттерна
+* Обработка в определенном порядке значений несколькими способами
