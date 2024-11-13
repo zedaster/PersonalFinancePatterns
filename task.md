@@ -112,3 +112,12 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 * Интерфейс CommandHandler содержит один единственный метод handleCommand для запуска целевого действия
 * Каждое действие в программе (добавление операции, установка баланс и т.д.) является отдельной командой и обрабатывается
 в своем экземпляре класса, который реализует CommandHandler
+
+## Задание 17. Interpreter
+Класс: MultiCommandHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/MultiCommandHandler.java)
+
+Пример использования: AddOperationHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/AddOperationHandler.java)
+
+### Причины реализации паттерна
+* Необходимость обработки таких аргументов, которое делиться на несколько подобных команд
+* Эти выражения рекурсивно должны вызывать обработчик команды

@@ -13,15 +13,17 @@ import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 import ru.naumen.personalfinancebot.service.CategoryParseService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Обработчик команды, которая добавляет операцию и отправляет пользователю сообщение
+ * Пример:
  *
  * @author Aleksandr Kornilov
  */
-public class AddOperationHandler implements CommandHandler {
+public class AddOperationHandler extends MultiCommandHandler {
     /**
      * Сообщение об успешном добавлении дохода для пользователя
      */
@@ -36,7 +38,7 @@ public class AddOperationHandler implements CommandHandler {
      * Сообщение о неверно переданном количестве аргументов для команды /add_[income|expense]
      */
     private static final String INCORRECT_OPERATION_ARGS_AMOUNT =
-            "Данная команда принимает 2 аргумента: [payment - сумма] [категория расхода/дохода]";
+            "Данная команда принимает аргументы: [payment - сумма 1] [категория расхода/дохода 1] [payment - сумма 2] [категория расхода/дохода 2] ...";
 
     /**
      * Сообщение об отсутствии категории
@@ -84,19 +86,47 @@ public class AddOperationHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
-        if (commandData.getArgs().size() < 2) {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_OPERATION_ARGS_AMOUNT);
-            return;
-        }
+    protected ArgumentSplitter getArgumentSplitter() {
+        return (args -> {
+           List<List<String>> splitArgs = new ArrayList<>();
+           List<String> currentList = null;
+
+            if (args.size() < 2) {
+                throw new ArgumentSplitterException(INCORRECT_OPERATION_ARGS_AMOUNT);
+            }
+
+           for (String arg : args) {
+               try {
+                   double sum = Double.parseDouble(arg);
+                   if (sum <= 0) {
+                       throw new ArgumentSplitterException(INCORRECT_PAYMENT_ARG);
+                   }
+                   if (currentList != null) {
+                       splitArgs.add(currentList);
+                   }
+                   currentList = new ArrayList<>();
+                   currentList.add(String.valueOf(sum));
+               } catch (NumberFormatException e) {
+                   if (currentList == null) {
+                       throw new ArgumentSplitterException(INCORRECT_PAYMENT_ARG);
+                   }
+                   currentList.add(arg);
+               }
+           }
+            splitArgs.add(currentList);
+
+           return splitArgs;
+        });
+    }
+
+    @Override
+    public void handleSingleCommand(CommandData commandData, Session session) {
+
         Operation operation;
         try {
             operation = createOperationRecord(commandData.getUser(), commandData.getArgs(), categoryType, session);
         } catch (NotExistingCategoryException e) {
             commandData.getBot().sendMessage(commandData.getUser(), CATEGORY_DOES_NOT_EXISTS);
-            return;
-        } catch (NumberFormatException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_PAYMENT_ARG);
             return;
         } catch (IllegalArgumentException e) {
             commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_CATEGORY_ARGUMENT_FORMAT);
@@ -124,15 +154,10 @@ public class AddOperationHandler implements CommandHandler {
      */
     private Operation createOperationRecord(User user, List<String> args, CategoryType type, Session session)
             throws NotExistingCategoryException {
-        double payment = Double.parseDouble(args.get(0));
-        if (payment <= 0) {
-            throw new NumberFormatException();
-        }
+        double payment = Double.parseDouble(args.get(0)); // This payment is bigger than 0
         String categoryName = this.categoryParseService.parseCategory(args.subList(1, args.size()));
         if (type == CategoryType.EXPENSE) {
-            payment = -Math.abs(payment);
-        } else if (type == CategoryType.INCOME) {
-            payment = Math.abs(payment);
+            payment = -payment;
         }
         Optional<Category> category = this.categoryRepository.getCategoryByName(session, user, type, categoryName);
         if (category.isEmpty()) {

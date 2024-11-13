@@ -27,7 +27,7 @@ public class CommandData {
     /**
      * Список аргументов к команде
      */
-    private final List<String> args;
+    private List<String> args;
 
     public CommandData(Bot bot, User user, String commandName, List<String> args) {
         this.bot = bot;
@@ -62,5 +62,13 @@ public class CommandData {
      */
     public List<String> getArgs() {
         return args;
+    }
+
+    public void setArgs(List<String> args) {
+        this.args = args;
+    }
+
+    public CommandData copy() {
+        return new CommandData(bot, user, commandName, args);
     }
 }
