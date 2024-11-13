@@ -6,6 +6,7 @@ import ru.naumen.personalfinancebot.handler.commandData.CommandData;
 /**
  * Обработчик команды для бота
  */
+// Паттерн Command
 public interface CommandHandler {
     /**
      * Метод, вызываемый при получении команды

@@ -103,3 +103,12 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 
 ### Причины реализации паттерна
 * Обработка в определенном порядке значений несколькими способами
+
+## Задание 16. Command
+Классы: CommandHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/CommandHandler.java) и его наследники
+в пакете command [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command)
+
+### Признаки паттерна
+* Интерфейс CommandHandler содержит один единственный метод handleCommand для запуска целевого действия
+* Каждое действие в программе (добавление операции, установка баланс и т.д.) является отдельной командой и обрабатывается
+в своем экземпляре класса, который реализует CommandHandler

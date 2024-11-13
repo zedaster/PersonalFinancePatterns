@@ -76,8 +76,7 @@ public class FinanceBotHandler {
         commandHandlers.put("budget", new SingleBudgetHandler(budgetRepository, operationRepository,
                 numberFormatService, monthFormatService));
         commandHandlers.put("budget_help", new HelpBudgetHandler());
-        commandHandlers.put("budget_create", new CreateBudgetHandler(budgetRepository, operationRepository,
-                numberFormatService, monthFormatService));
+        commandHandlers.put("budget_create", new CreateBudgetHandler(budgetRepository, operationRepository));
         commandHandlers.put("budget_set_income", new EditBudgetHandler(budgetRepository, numberParseService,
                 dateParseService, numberFormatService, monthFormatService, CategoryType.INCOME));
         commandHandlers.put("budget_set_expenses", new EditBudgetHandler(budgetRepository, numberParseService,
