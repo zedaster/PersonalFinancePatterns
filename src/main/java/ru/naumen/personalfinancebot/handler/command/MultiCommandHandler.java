@@ -3,7 +3,12 @@ package ru.naumen.personalfinancebot.handler.command;
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Команда, которая может содержать повторяющиеся аргументы
@@ -21,9 +26,7 @@ public abstract class MultiCommandHandler implements CommandHandler {
     }
 
     private Stream<CommandData> splitCommandData(CommandData commandData) throws ArgumentSplitterException {
-        return this.getArgumentSplitter()
-                .splitArguments(commandData.getArgs())
-                .stream()
+        return streamFromIterator(this.splitArguments(commandData.getArgs()))
                 .map((subArgs) -> {
                     CommandData subData = commandData.copy();
                     subData.setArgs(subArgs);
@@ -31,7 +34,13 @@ public abstract class MultiCommandHandler implements CommandHandler {
                 });
     }
 
-    protected abstract ArgumentSplitter getArgumentSplitter();
+    private <T> Stream<T> streamFromIterator(Iterator<T> iterator) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+                false);
+    }
+
+    protected abstract ArgumentSplitter splitArguments(List<String> args);
 
     protected abstract void handleSingleCommand(CommandData commandData, Session session);
 }

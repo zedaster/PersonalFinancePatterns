@@ -1,6 +1,8 @@
-package ru.naumen.personalfinancebot.handler.command;
+package ru.naumen.personalfinancebot.handler.command.operation;
 
 import org.hibernate.Session;
+import ru.naumen.personalfinancebot.handler.command.ArgumentSplitter;
+import ru.naumen.personalfinancebot.handler.command.MultiCommandHandler;
 import ru.naumen.personalfinancebot.handler.commandData.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.model.Category;
@@ -13,7 +15,6 @@ import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 import ru.naumen.personalfinancebot.service.CategoryParseService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,21 +36,10 @@ public class AddOperationHandler extends MultiCommandHandler {
     private static final String ADD_EXPENSE_MESSAGE = "Добавлен расход по категории: ";
 
     /**
-     * Сообщение о неверно переданном количестве аргументов для команды /add_[income|expense]
-     */
-    private static final String INCORRECT_OPERATION_ARGS_AMOUNT =
-            "Данная команда принимает аргументы: [payment - сумма 1] [категория расхода/дохода 1] [payment - сумма 2] [категория расхода/дохода 2] ...";
-
-    /**
      * Сообщение об отсутствии категории
      */
     private static final String CATEGORY_DOES_NOT_EXISTS =
             "Указанная категория не числится. Используйте команду /add_[income/expense]_category чтобы добавить её";
-
-    /**
-     * Сообщение о неверно переданном аргументе, который отвечает за сумму операции
-     */
-    private static final String INCORRECT_PAYMENT_ARG = "Сумма операции указана в неверном формате. Передайте корректное положительно число";
 
     /**
      * Тип категории, с которым будет работать обработчик
@@ -86,37 +76,8 @@ public class AddOperationHandler extends MultiCommandHandler {
     }
 
     @Override
-    protected ArgumentSplitter getArgumentSplitter() {
-        return (args -> {
-           List<List<String>> splitArgs = new ArrayList<>();
-           List<String> currentList = null;
-
-            if (args.size() < 2) {
-                throw new ArgumentSplitterException(INCORRECT_OPERATION_ARGS_AMOUNT);
-            }
-
-           for (String arg : args) {
-               try {
-                   double sum = Double.parseDouble(arg);
-                   if (sum <= 0) {
-                       throw new ArgumentSplitterException(INCORRECT_PAYMENT_ARG);
-                   }
-                   if (currentList != null) {
-                       splitArgs.add(currentList);
-                   }
-                   currentList = new ArrayList<>();
-                   currentList.add(String.valueOf(sum));
-               } catch (NumberFormatException e) {
-                   if (currentList == null) {
-                       throw new ArgumentSplitterException(INCORRECT_PAYMENT_ARG);
-                   }
-                   currentList.add(arg);
-               }
-           }
-            splitArgs.add(currentList);
-
-           return splitArgs;
-        });
+    protected ArgumentSplitter splitArguments(List<String> arguments) {
+        return new OperationSplitter(arguments);
     }
 
     @Override

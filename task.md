@@ -116,8 +116,15 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 ## Задание 17. Interpreter
 Класс: MultiCommandHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/MultiCommandHandler.java)
 
-Пример использования: AddOperationHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/AddOperationHandler.java)
+Пример использования: AddOperationHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/operation/AddOperationHandler.java)
 
 ### Причины реализации паттерна
 * Необходимость обработки таких аргументов, которое делиться на несколько подобных команд
 * Эти выражения рекурсивно должны вызывать обработчик команды
+
+## Задание 18. Iterator
+Класс: OperationSplitter [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/operation/OperationSplitter.java)
+
+### Причины реализации паттерна
+* Необходимо "ленивое" получение и обработка аргументов мультикоманды по мере парсинга
+* Создание единого интерфейса для получения аргументов мультикоманды
