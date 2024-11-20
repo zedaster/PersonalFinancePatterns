@@ -45,14 +45,14 @@ public class SetBalanceHandler implements CommandHandler {
         try {
             amount = numberParseService.parseBalance(commandData.getArgs());
         } catch (IllegalArgumentException e) {
-            commandData.getBot().sendMessage(commandData.getUser(),
+            commandData.getSender().sendMessage(commandData.getUser(),
                     "Команда введена неверно! Введите /set_balance <новый баланс>");
             return;
         }
 
         commandData.getUser().setBalance(amount);
         userRepository.saveUser(session, commandData.getUser());
-        commandData.getBot().sendMessage(
+        commandData.getSender().sendMessage(
                 commandData.getUser(),
                 SET_BALANCE_SUCCESSFULLY.formatted(this.numberFormatService.formatDouble(amount))
         );

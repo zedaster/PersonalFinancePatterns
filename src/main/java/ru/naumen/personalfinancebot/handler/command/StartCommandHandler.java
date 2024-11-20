@@ -16,6 +16,6 @@ public class StartCommandHandler implements CommandHandler {
 
     @Override
     public void handleCommand(CommandData commandData, Session session) {
-        commandData.getBot().sendMessage(commandData.getUser(), WELCOME_MESSAGE);
+        commandData.getSender().sendMessage(commandData.getUser(), WELCOME_MESSAGE);
     }
 }

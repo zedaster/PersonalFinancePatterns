@@ -21,7 +21,7 @@ public abstract class MultiCommandHandler implements CommandHandler {
             splitCommandData(commandData).forEach((subCommandData) ->
                     this.handleSingleCommand(subCommandData, session));
         } catch (ArgumentSplitterException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), e.getMessage());
+            commandData.getSender().sendMessage(commandData.getUser(), e.getMessage());
         }
     }
 

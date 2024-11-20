@@ -73,7 +73,7 @@ public class SingleBudgetHandler implements CommandHandler {
         YearMonth currentMonthYear = YearMonth.now();
         Optional<Budget> budget = this.budgetRepository.getBudget(session, commandData.getUser(), YearMonth.now());
         if (budget.isEmpty()) {
-            commandData.getBot().sendMessage(
+            commandData.getSender().sendMessage(
                     commandData.getUser(),
                     CURRENT_BUDGET_NOT_EXISTS.formatted(
                             monthFormatService.formatRuMonthName(currentMonthYear.getMonth()),
@@ -96,7 +96,7 @@ public class SingleBudgetHandler implements CommandHandler {
         double expensesLeft = Math.max(0, expectExpenses - realExpenses);
         double balance = commandData.getUser().getBalance();
 
-        commandData.getBot().sendMessage(
+        commandData.getSender().sendMessage(
                 commandData.getUser(),
                 CURRENT_BUDGET.formatted(
                         monthFormatService.formatRuMonthName(currentMonthYear.getMonth()),

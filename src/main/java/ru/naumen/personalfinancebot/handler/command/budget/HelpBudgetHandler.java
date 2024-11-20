@@ -22,6 +22,6 @@ public class HelpBudgetHandler implements CommandHandler {
 
     @Override
     public void handleCommand(CommandData commandData, Session session) {
-        commandData.getBot().sendMessage(commandData.getUser(), BUDGET_HELP);
+        commandData.getSender().sendMessage(commandData.getUser(), BUDGET_HELP);
     }
 }

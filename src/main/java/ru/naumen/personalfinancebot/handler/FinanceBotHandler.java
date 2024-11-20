@@ -42,8 +42,6 @@ public class FinanceBotHandler {
                              OperationRepository operationRepository,
                              CategoryRepository categoryRepository,
                              BudgetRepository budgetRepository) {
-
-        CategoryParseService categoryParseService = new CategoryParseService();
         DateParseService dateParseService = new DateParseService();
         NumberParseService numberParseService = new NumberParseService();
         OutputNumberFormatService numberFormatService = new OutputNumberFormatService();
@@ -56,17 +54,15 @@ public class FinanceBotHandler {
         commandHandlers.put("set_balance", new SetBalanceHandler(numberParseService, numberFormatService,
                 userRepository));
         commandHandlers.put("add_expense", new AddOperationHandler(CategoryType.EXPENSE, userRepository,
-                categoryRepository, operationRepository, categoryParseService));
+                categoryRepository, operationRepository));
         commandHandlers.put("add_income", new AddOperationHandler(CategoryType.INCOME, userRepository,
-                categoryRepository, operationRepository, categoryParseService));
-        commandHandlers.put("add_income_category", new AddCategoryHandler(CategoryType.INCOME, categoryRepository,
-                categoryParseService));
-        commandHandlers.put("add_expense_category", new AddCategoryHandler(CategoryType.EXPENSE, categoryRepository,
-                categoryParseService));
+                categoryRepository, operationRepository));
+        commandHandlers.put("add_income_category", new AddCategoryHandler(CategoryType.INCOME, categoryRepository));
+        commandHandlers.put("add_expense_category", new AddCategoryHandler(CategoryType.EXPENSE, categoryRepository));
         commandHandlers.put("remove_income_category", new RemoveCategoryHandler(CategoryType.INCOME,
-                categoryRepository, categoryParseService));
+                categoryRepository));
         commandHandlers.put("remove_expense_category", new RemoveCategoryHandler(CategoryType.EXPENSE,
-                categoryRepository, categoryParseService));
+                categoryRepository));
         commandHandlers.put("list_categories", new FullListCategoriesHandler(categoryListService));
         commandHandlers.put("list_income_categories", new SingleListCategoriesHandler(CategoryType.INCOME,
                 categoryListService));
@@ -97,7 +93,7 @@ public class FinanceBotHandler {
         if (handler != null) {
             handler.handleCommand(commandData, session);
         } else {
-            commandData.getBot().sendMessage(commandData.getUser(), COMMAND_NOT_FOUND);
+            commandData.getSender().sendMessage(commandData.getUser(), COMMAND_NOT_FOUND);
         }
     }
 }

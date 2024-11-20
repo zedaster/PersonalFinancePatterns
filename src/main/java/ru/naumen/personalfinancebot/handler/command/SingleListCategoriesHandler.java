@@ -30,6 +30,6 @@ public class SingleListCategoriesHandler implements CommandHandler {
     @Override
     public void handleCommand(CommandData commandData, Session session) {
         String content = categoryListService.getListContent(session, commandData.getUser(), categoryType);
-        commandData.getBot().sendMessage(commandData.getUser(), content);
+        commandData.getSender().sendMessage(commandData.getUser(), content);
     }
 }

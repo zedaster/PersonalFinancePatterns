@@ -14,6 +14,16 @@ public class CategoryParseService {
     private static final String INCORRECT_CATEGORY_ARGUMENT_COUNT =
             "Данная команда принимает [название категории] в одно или несколько слов.";
 
+    private static final CategoryParseService instance = new CategoryParseService();
+
+    private CategoryParseService() {
+
+    }
+
+    public static CategoryParseService getInstance() {
+        return instance;
+    }
+
     /**
      * Парсит категорию, введенную в аргументах
      *

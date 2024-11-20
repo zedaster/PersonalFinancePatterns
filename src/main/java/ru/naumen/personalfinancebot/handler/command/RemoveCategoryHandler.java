@@ -37,12 +37,11 @@ public class RemoveCategoryHandler implements CommandHandler {
     /**
      * Сервис, который парсит категорию
      */
-    private final CategoryParseService categoryParseService;
+    private final CategoryParseService categoryParseService = CategoryParseService.getInstance();
 
-    public RemoveCategoryHandler(CategoryType categoryType, CategoryRepository categoryRepository, CategoryParseService categoryParseService) {
+    public RemoveCategoryHandler(CategoryType categoryType, CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
         this.categoryType = categoryType;
-        this.categoryParseService = categoryParseService;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class RemoveCategoryHandler implements CommandHandler {
         try {
             categoryName = categoryParseService.parseCategory(commandData.getArgs());
         } catch (IllegalArgumentException ex) {
-            commandData.getBot().sendMessage(commandData.getUser(), ex.getMessage());
+            commandData.getSender().sendMessage(commandData.getUser(), ex.getMessage());
             return;
         }
 
@@ -60,11 +59,11 @@ public class RemoveCategoryHandler implements CommandHandler {
             categoryRepository.removeUserCategoryByName(session, commandData.getUser(), categoryType, categoryName);
         } catch (NotExistingCategoryException e) {
             String responseText = USER_CATEGORY_ALREADY_NOT_EXISTS.formatted(typeLabel, categoryName);
-            commandData.getBot().sendMessage(commandData.getUser(), responseText);
+            commandData.getSender().sendMessage(commandData.getUser(), responseText);
             return;
         }
 
         String responseText = USER_CATEGORY_REMOVED.formatted(typeLabel, categoryName);
-        commandData.getBot().sendMessage(commandData.getUser(), responseText);
+        commandData.getSender().sendMessage(commandData.getUser(), responseText);
     }
 }

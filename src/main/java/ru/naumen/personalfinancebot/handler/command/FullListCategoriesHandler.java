@@ -24,6 +24,6 @@ public class FullListCategoriesHandler implements CommandHandler {
     public void handleCommand(CommandData commandData, Session session) {
         String incomeContent = categoryListService.getListContent(session, commandData.getUser(), CategoryType.INCOME);
         String expenseContent = categoryListService.getListContent(session, commandData.getUser(), CategoryType.EXPENSE);
-        commandData.getBot().sendMessage(commandData.getUser(), incomeContent + "\n" + expenseContent);
+        commandData.getSender().sendMessage(commandData.getUser(), incomeContent + "\n" + expenseContent);
     }
 }

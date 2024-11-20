@@ -7,30 +7,21 @@ package ru.naumen.personalfinancebot.model;
  */
 public enum CategoryType {
     INCOME("income", "доходов"),
-    EXPENSE("expense", "расходов");
+    EXPENSE("expenses", "расходов");
 
     /**
-     * Именование категории, используемое в командах
+     * Строковое именование категории
      */
-    private final String commandLabel;
+    private final String label;
 
     /**
      * Название, которое будет показано при выводе множества категории этого типа
      */
     private final String pluralShowLabel;
 
-    CategoryType(String commandLabel, String pluralShowLabel) {
-        this.commandLabel = commandLabel;
+    CategoryType(String label, String pluralShowLabel) {
+        this.label = label;
         this.pluralShowLabel = pluralShowLabel;
-    }
-
-    /**
-     * Выводит именование категории, используемое в командах.
-     * Для CategoryType.INCOME будет выведено "income",
-     * а для CategoryType.EXPENSE - "expense".
-     */
-    public String getCommandLabel() {
-        return commandLabel;
     }
 
     /**
@@ -40,5 +31,10 @@ public enum CategoryType {
      */
     public String getPluralShowLabel() {
         return pluralShowLabel;
+    }
+
+    @Override
+    public String toString() {
+        return this.label;
     }
 }

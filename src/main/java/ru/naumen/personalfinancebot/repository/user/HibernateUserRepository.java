@@ -25,6 +25,17 @@ public class HibernateUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> getUserById(Session session, Long userId) {
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(root).where(cb.equal(root.get("id"), userId));
+
+        Query<User> query = session.createQuery(cq);
+        return query.getResultStream().findFirst();
+    }
+
+    @Override
     public void saveUser(Session session, User user) {
         session.saveOrUpdate(user);
     }

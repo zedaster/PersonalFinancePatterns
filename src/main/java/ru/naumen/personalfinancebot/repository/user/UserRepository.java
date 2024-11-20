@@ -15,6 +15,11 @@ public interface UserRepository {
     Optional<User> getUserByTelegramChatId(Session session, Long chatId);
 
     /**
+     * Получает пользователя по userId
+     */
+    Optional<User> getUserById(Session session, Long userId);
+
+    /**
      * Сохраняет существующего или нового юзера в БД
      */
     void saveUser(Session session, User user);

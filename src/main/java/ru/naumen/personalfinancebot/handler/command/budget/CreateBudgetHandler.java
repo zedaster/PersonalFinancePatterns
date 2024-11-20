@@ -75,12 +75,12 @@ public class CreateBudgetHandler implements CommandHandler {
             expectedIncome = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
             expectedExpenses = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
         } catch (ArgumentValidatorException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), e.getInvalidMessage());
+            commandData.getSender().sendMessage(commandData.getUser(), e.getInvalidMessage());
             return;
         }
 
         if (yearMonth.isBefore(YearMonth.now())) {
-            commandData.getBot().sendMessage(commandData.getUser(), CANT_CREATE_OLD_BUDGET);
+            commandData.getSender().sendMessage(commandData.getUser(), CANT_CREATE_OLD_BUDGET);
             return;
         }
 
@@ -98,7 +98,7 @@ public class CreateBudgetHandler implements CommandHandler {
         budget.setUser(user);
         budgetRepository.saveBudget(session, budget);
 
-        commandData.getBot().sendMessage(user,
+        commandData.getSender().sendMessage(user,
                 BUDGET_CREATED
                         .nextRuMonth(yearMonth.getMonth())
                         .nextInteger(yearMonth.getYear())

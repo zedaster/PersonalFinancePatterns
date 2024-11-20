@@ -29,10 +29,10 @@ public class ReportExpensesHandler implements CommandHandler {
     @Override
     public void handleCommand(CommandData commandData, Session session) {
         if (commandData.getArgs().size() != 1) {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_SELF_REPORT_ARGS);
+            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_SELF_REPORT_ARGS);
             return;
         }
         String report = this.reportService.getExpenseReport(session, commandData.getUser(), commandData.getArgs().get(0));
-        commandData.getBot().sendMessage(commandData.getUser(), report);
+        commandData.getSender().sendMessage(commandData.getUser(), report);
     }
 }

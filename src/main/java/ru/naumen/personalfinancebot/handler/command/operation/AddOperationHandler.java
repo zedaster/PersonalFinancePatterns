@@ -62,17 +62,15 @@ public class AddOperationHandler extends MultiCommandHandler {
     private final OperationRepository operationRepository;
 
     /***/
-    private final CategoryParseService categoryParseService;
+    private final CategoryParseService categoryParseService = CategoryParseService.getInstance();
 
 
     public AddOperationHandler(CategoryType categoryType, UserRepository userRepository,
-                               CategoryRepository categoryRepository, OperationRepository operationRepository,
-                               CategoryParseService categoryParseService) {
+                               CategoryRepository categoryRepository, OperationRepository operationRepository) {
         this.categoryType = categoryType;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.operationRepository = operationRepository;
-        this.categoryParseService = categoryParseService;
     }
 
     @Override
@@ -87,10 +85,10 @@ public class AddOperationHandler extends MultiCommandHandler {
         try {
             operation = createOperationRecord(commandData.getUser(), commandData.getArgs(), categoryType, session);
         } catch (NotExistingCategoryException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), CATEGORY_DOES_NOT_EXISTS);
+            commandData.getSender().sendMessage(commandData.getUser(), CATEGORY_DOES_NOT_EXISTS);
             return;
         } catch (IllegalArgumentException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_CATEGORY_ARGUMENT_FORMAT);
+            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_CATEGORY_ARGUMENT_FORMAT);
             return;
         }
         double currentBalance = commandData.getUser().getBalance() + operation.getPayment();
@@ -100,7 +98,7 @@ public class AddOperationHandler extends MultiCommandHandler {
         String message = categoryType == CategoryType.INCOME
                 ? ADD_INCOME_MESSAGE
                 : ADD_EXPENSE_MESSAGE;
-        commandData.getBot().sendMessage(user,
+        commandData.getSender().sendMessage(user,
                 message + operation.getCategory().getCategoryName());
 
     }

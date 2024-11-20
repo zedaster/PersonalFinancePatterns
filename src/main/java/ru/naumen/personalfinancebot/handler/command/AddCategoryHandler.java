@@ -43,12 +43,11 @@ public class AddCategoryHandler implements CommandHandler {
     /**
      * Сервис, который парсит категорию
      */
-    private final CategoryParseService categoryParseService;
+    private final CategoryParseService categoryParseService = CategoryParseService.getInstance();
 
-    public AddCategoryHandler(CategoryType type, CategoryRepository categoryRepository, CategoryParseService categoryParseService) {
+    public AddCategoryHandler(CategoryType type, CategoryRepository categoryRepository) {
         this.type = type;
         this.categoryRepository = categoryRepository;
-        this.categoryParseService = categoryParseService;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class AddCategoryHandler implements CommandHandler {
         try {
             categoryName = categoryParseService.parseCategory(commandData.getArgs());
         } catch (IllegalArgumentException ex) {
-            commandData.getBot().sendMessage(commandData.getUser(), ex.getMessage());
+            commandData.getSender().sendMessage(commandData.getUser(), ex.getMessage());
             return;
         }
 
@@ -66,15 +65,15 @@ public class AddCategoryHandler implements CommandHandler {
             categoryRepository.createUserCategory(session, commandData.getUser(), type, categoryName);
         } catch (ExistingUserCategoryException e) {
             String responseText = USER_CATEGORY_ALREADY_EXISTS.formatted(typeLabel, categoryName);
-            commandData.getBot().sendMessage(commandData.getUser(), responseText);
+            commandData.getSender().sendMessage(commandData.getUser(), responseText);
             return;
         } catch (ExistingStandardCategoryException e) {
             String responseText = STANDARD_CATEGORY_ALREADY_EXISTS.formatted(typeLabel, categoryName);
-            commandData.getBot().sendMessage(commandData.getUser(), responseText);
+            commandData.getSender().sendMessage(commandData.getUser(), responseText);
             return;
         }
 
         String responseText = USER_CATEGORY_ADDED.formatted(typeLabel, categoryName);
-        commandData.getBot().sendMessage(commandData.getUser(), responseText);
+        commandData.getSender().sendMessage(commandData.getUser(), responseText);
     }
 }

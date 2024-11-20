@@ -131,7 +131,7 @@ public class ListBudgetHandler implements CommandHandler {
             try {
                 year = dateParseService.parseYear(arguments.get(0));
             } catch (NumberFormatException e) {
-                commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_BUDGET_YEAR_ARG);
+                commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_BUDGET_YEAR_ARG);
                 return;
             }
             from = YearMonth.of(year, 1);
@@ -142,26 +142,26 @@ public class ListBudgetHandler implements CommandHandler {
                 from = dateParseService.parseYearMonth(arguments.get(0));
                 to = dateParseService.parseYearMonth(arguments.get(1));
             } catch (DateTimeParseException e) {
-                commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
+                commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
                 return;
             }
 
             long monthsBetween = from.until(to, ChronoUnit.MONTHS) + 1;
             postfixMessage = BUDGET_LIST_RANGE_POSTFIX.formatted(String.valueOf(monthsBetween));
         } else {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_LIST_BUDGET_ENTIRE_ARGS);
+            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_LIST_BUDGET_ENTIRE_ARGS);
             return;
         }
 
         if (from.isAfter(to)) {
-            commandData.getBot().sendMessage(commandData.getUser(), BUDGET_LIST_FROM_IS_AFTER_TO);
+            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_LIST_FROM_IS_AFTER_TO);
             return;
         }
 
         // Список бюджетов за указанный период;
         List<Budget> budgets = this.budgetRepository.selectBudgetRange(session, commandData.getUser(), from, to);
         if (budgets.isEmpty()) {
-            commandData.getBot().sendMessage(commandData.getUser(), BUDGET_LIST_EMPTY);
+            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_LIST_EMPTY);
             return;
         }
 
@@ -189,6 +189,6 @@ public class ListBudgetHandler implements CommandHandler {
         }
         resultReplyMessage.append(postfixMessage);
 
-        commandData.getBot().sendMessage(commandData.getUser(), resultReplyMessage.toString());
+        commandData.getSender().sendMessage(commandData.getUser(), resultReplyMessage.toString());
     }
 }

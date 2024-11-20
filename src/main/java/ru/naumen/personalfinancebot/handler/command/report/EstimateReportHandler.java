@@ -42,22 +42,22 @@ public class EstimateReportHandler implements CommandHandler {
         try {
             yearMonth = this.dateParseService.parseYearMonthArgs(commandData.getArgs());
         } catch (DateTimeParseException exception) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
+            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
             return;
         } catch (IllegalArgumentException exception) {
-            commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_ARGUMENT_COUNT);
+            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_ARGUMENT_COUNT);
             return;
         }
 
         String report = this.reportService.getEstimateReport(session, yearMonth);
         if (report == null) {
             if (commandData.getArgs().isEmpty()) {
-                commandData.getBot().sendMessage(commandData.getUser(), Message.CURRENT_DATA_NOT_EXISTS);
+                commandData.getSender().sendMessage(commandData.getUser(), Message.CURRENT_DATA_NOT_EXISTS);
                 return;
             }
-            commandData.getBot().sendMessage(commandData.getUser(), Message.DATA_NOT_EXISTS);
+            commandData.getSender().sendMessage(commandData.getUser(), Message.DATA_NOT_EXISTS);
             return;
         }
-        commandData.getBot().sendMessage(commandData.getUser(), report);
+        commandData.getSender().sendMessage(commandData.getUser(), report);
     }
 }

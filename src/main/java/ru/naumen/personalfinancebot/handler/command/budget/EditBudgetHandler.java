@@ -107,25 +107,25 @@ public class EditBudgetHandler implements CommandHandler {
                 yearMonth = this.dateParseService.parseYearMonth(commandData.getArgs().get(0));
                 amount = this.numberParseService.parsePositiveDouble(commandData.getArgs().get(1));
             } else {
-                commandData.getBot().sendMessage(commandData.getUser(), INCORRECT_EDIT_BUDGET_ENTIRE_ARGS);
+                commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_EDIT_BUDGET_ENTIRE_ARGS);
                 return;
             }
         } catch (NumberFormatException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_BUDGET_NUMBER_ARG);
+            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_BUDGET_NUMBER_ARG);
             return;
         } catch (DateTimeParseException e) {
-            commandData.getBot().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
+            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
             return;
         }
 
         if (yearMonth.isBefore(YearMonth.now())) {
-            commandData.getBot().sendMessage(commandData.getUser(), CANT_EDIT_OLD_BUDGET);
+            commandData.getSender().sendMessage(commandData.getUser(), CANT_EDIT_OLD_BUDGET);
             return;
         }
 
         Optional<Budget> budget = this.budgetRepository.getBudget(session, commandData.getUser(), yearMonth);
         if (budget.isEmpty()) {
-            commandData.getBot().sendMessage(commandData.getUser(), BUDGET_NOT_FOUND);
+            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_NOT_FOUND);
             return;
         }
 
@@ -138,7 +138,7 @@ public class EditBudgetHandler implements CommandHandler {
 
         double expectIncome = budget.get().getIncome();
         double expectExpenses = budget.get().getExpense();
-        commandData.getBot().sendMessage(
+        commandData.getSender().sendMessage(
                 commandData.getUser(),
                 BUDGET_EDITED.formatted(
                         monthFormatService.formatRuMonthName(yearMonth.getMonth()),

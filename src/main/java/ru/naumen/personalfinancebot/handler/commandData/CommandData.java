@@ -1,6 +1,6 @@
 package ru.naumen.personalfinancebot.handler.commandData;
 
-import ru.naumen.personalfinancebot.bot.Bot;
+import ru.naumen.personalfinancebot.handler.CommandSender;
 import ru.naumen.personalfinancebot.model.User;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public class CommandData {
     /**
      * Бот, который обрабатывает команду
      */
-    private final Bot bot;
+    private final CommandSender sender;
 
     /**
      * Пользователь, который отправил команду
@@ -29,18 +29,18 @@ public class CommandData {
      */
     private List<String> args;
 
-    public CommandData(Bot bot, User user, String commandName, List<String> args) {
-        this.bot = bot;
+    public CommandData(CommandSender sender, User user, String commandName, List<String> args) {
+        this.sender = sender;
         this.user = user;
         this.commandName = commandName;
         this.args = args;
     }
 
     /**
-     * Получает бота, который обрабатывает команду
+     * Получает отправителя, который обрабатывает команду
      */
-    public Bot getBot() {
-        return bot;
+    public CommandSender getSender() {
+        return sender;
     }
 
     /**
@@ -69,6 +69,6 @@ public class CommandData {
     }
 
     public CommandData copy() {
-        return new CommandData(bot, user, commandName, args);
+        return new CommandData(sender, user, commandName, args);
     }
 }

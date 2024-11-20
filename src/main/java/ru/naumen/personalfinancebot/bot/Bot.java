@@ -1,5 +1,6 @@
 package ru.naumen.personalfinancebot.bot;
 
+import ru.naumen.personalfinancebot.handler.CommandSender;
 import ru.naumen.personalfinancebot.mode.FormatMode;
 import ru.naumen.personalfinancebot.model.User;
 
@@ -7,7 +8,7 @@ import ru.naumen.personalfinancebot.model.User;
  * Описание методов для бота
  */
 // Паттерн Bridge
-public abstract class Bot {
+public abstract class Bot implements CommandSender {
     /**
      * Режим форматирования бота
      */
