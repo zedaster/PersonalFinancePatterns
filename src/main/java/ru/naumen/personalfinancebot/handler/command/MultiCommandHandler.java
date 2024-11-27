@@ -1,7 +1,7 @@
 package ru.naumen.personalfinancebot.handler.command;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,12 +16,22 @@ import java.util.stream.StreamSupport;
 // Паттерн Interpreter
 public abstract class MultiCommandHandler implements CommandHandler {
     @Override
-    public final void handleCommand(CommandData commandData, Session session) {
+    public final void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         try {
-            splitCommandData(commandData).forEach((subCommandData) ->
-                    this.handleSingleCommand(subCommandData, session));
-        } catch (ArgumentSplitterException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), e.getMessage());
+            splitCommandData(commandData).forEach((subCommandData) -> {
+                try {
+                    this.handleSingleCommand(subCommandData, session);
+                } catch (HandleCommandException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (RuntimeException e) {
+            if (e.getCause() != null && e.getCause() instanceof HandleCommandException) {
+                throw (HandleCommandException) e.getCause();
+            }
+            if (e instanceof ArgumentSplitterException) {
+                throw new HandleCommandException(commandData, e.getMessage());
+            }
         }
     }
 
@@ -42,5 +52,5 @@ public abstract class MultiCommandHandler implements CommandHandler {
 
     protected abstract ArgumentSplitter splitArguments(List<String> args);
 
-    protected abstract void handleSingleCommand(CommandData commandData, Session session);
+    protected abstract void handleSingleCommand(CommandData commandData, Session session) throws HandleCommandException;
 }

@@ -2,8 +2,9 @@ package ru.naumen.personalfinancebot.handler.command.operation;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.ArgumentSplitter;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
 import ru.naumen.personalfinancebot.handler.command.MultiCommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.model.Category;
 import ru.naumen.personalfinancebot.model.CategoryType;
@@ -79,17 +80,15 @@ public class AddOperationHandler extends MultiCommandHandler {
     }
 
     @Override
-    public void handleSingleCommand(CommandData commandData, Session session) {
+    public void handleSingleCommand(CommandData commandData, Session session) throws HandleCommandException {
 
         Operation operation;
         try {
             operation = createOperationRecord(commandData.getUser(), commandData.getArgs(), categoryType, session);
         } catch (NotExistingCategoryException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), CATEGORY_DOES_NOT_EXISTS);
-            return;
+            throw new HandleCommandException(commandData, CATEGORY_DOES_NOT_EXISTS);
         } catch (IllegalArgumentException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_CATEGORY_ARGUMENT_FORMAT);
-            return;
+            throw new HandleCommandException(commandData, Message.INCORRECT_CATEGORY_ARGUMENT_FORMAT);
         }
         double currentBalance = commandData.getUser().getBalance() + operation.getPayment();
         User user = commandData.getUser();

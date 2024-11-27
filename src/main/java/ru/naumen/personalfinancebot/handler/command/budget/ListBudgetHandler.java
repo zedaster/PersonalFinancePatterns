@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.model.Budget;
 import ru.naumen.personalfinancebot.model.CategoryType;
@@ -118,7 +119,7 @@ public class ListBudgetHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         List<String> arguments = commandData.getArgs();
         YearMonth from = YearMonth.now();
         YearMonth to = YearMonth.now();
@@ -131,8 +132,7 @@ public class ListBudgetHandler implements CommandHandler {
             try {
                 year = dateParseService.parseYear(arguments.get(0));
             } catch (NumberFormatException e) {
-                commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_BUDGET_YEAR_ARG);
-                return;
+                throw new HandleCommandException(commandData, INCORRECT_BUDGET_YEAR_ARG);
             }
             from = YearMonth.of(year, 1);
             to = YearMonth.of(year, 12);
@@ -142,27 +142,23 @@ public class ListBudgetHandler implements CommandHandler {
                 from = dateParseService.parseYearMonth(arguments.get(0));
                 to = dateParseService.parseYearMonth(arguments.get(1));
             } catch (DateTimeParseException e) {
-                commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
-                return;
+                throw new HandleCommandException(commandData, Message.INCORRECT_YEAR_MONTH_FORMAT);
             }
 
             long monthsBetween = from.until(to, ChronoUnit.MONTHS) + 1;
             postfixMessage = BUDGET_LIST_RANGE_POSTFIX.formatted(String.valueOf(monthsBetween));
         } else {
-            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_LIST_BUDGET_ENTIRE_ARGS);
-            return;
+            throw new HandleCommandException(commandData, INCORRECT_LIST_BUDGET_ENTIRE_ARGS);
         }
 
         if (from.isAfter(to)) {
-            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_LIST_FROM_IS_AFTER_TO);
-            return;
+            throw new HandleCommandException(commandData, BUDGET_LIST_FROM_IS_AFTER_TO);
         }
 
         // Список бюджетов за указанный период;
         List<Budget> budgets = this.budgetRepository.selectBudgetRange(session, commandData.getUser(), from, to);
         if (budgets.isEmpty()) {
-            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_LIST_EMPTY);
-            return;
+            throw new HandleCommandException(commandData, BUDGET_LIST_EMPTY);
         }
 
         StringBuilder resultReplyMessage = new StringBuilder();

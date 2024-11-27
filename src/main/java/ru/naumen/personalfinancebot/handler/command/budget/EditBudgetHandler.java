@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.model.Budget;
 import ru.naumen.personalfinancebot.model.CategoryType;
@@ -96,7 +97,7 @@ public class EditBudgetHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         int argsCount = commandData.getArgs().size();
         YearMonth yearMonth = YearMonth.now();
         double amount;
@@ -107,26 +108,21 @@ public class EditBudgetHandler implements CommandHandler {
                 yearMonth = this.dateParseService.parseYearMonth(commandData.getArgs().get(0));
                 amount = this.numberParseService.parsePositiveDouble(commandData.getArgs().get(1));
             } else {
-                commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_EDIT_BUDGET_ENTIRE_ARGS);
-                return;
+                throw new HandleCommandException(commandData, INCORRECT_EDIT_BUDGET_ENTIRE_ARGS);
             }
         } catch (NumberFormatException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_BUDGET_NUMBER_ARG);
-            return;
+            throw new HandleCommandException(commandData, Message.INCORRECT_BUDGET_NUMBER_ARG);
         } catch (DateTimeParseException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
-            return;
+            throw new HandleCommandException(commandData, Message.INCORRECT_YEAR_MONTH_FORMAT);
         }
 
         if (yearMonth.isBefore(YearMonth.now())) {
-            commandData.getSender().sendMessage(commandData.getUser(), CANT_EDIT_OLD_BUDGET);
-            return;
+            throw new HandleCommandException(commandData, CANT_EDIT_OLD_BUDGET);
         }
 
         Optional<Budget> budget = this.budgetRepository.getBudget(session, commandData.getUser(), yearMonth);
         if (budget.isEmpty()) {
-            commandData.getSender().sendMessage(commandData.getUser(), BUDGET_NOT_FOUND);
-            return;
+            throw new HandleCommandException(commandData, BUDGET_NOT_FOUND);
         }
 
         switch (this.type) {

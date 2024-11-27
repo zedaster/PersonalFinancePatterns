@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.model.Budget;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
@@ -25,7 +26,7 @@ public class SingleBudgetHandler implements CommandHandler {
     /**
      * Шаблон сообщения для вывода текущего бюджета
      */
-    private final String CURRENT_BUDGET = """
+    private static final String CURRENT_BUDGET = """
             Бюджет на %s %s:
             Ожидаемые доходы: %s
             Ожидаемые расходы: %s
@@ -69,17 +70,15 @@ public class SingleBudgetHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         YearMonth currentMonthYear = YearMonth.now();
         Optional<Budget> budget = this.budgetRepository.getBudget(session, commandData.getUser(), YearMonth.now());
         if (budget.isEmpty()) {
-            commandData.getSender().sendMessage(
-                    commandData.getUser(),
+            throw new HandleCommandException(commandData,
                     CURRENT_BUDGET_NOT_EXISTS.formatted(
                             monthFormatService.formatRuMonthName(currentMonthYear.getMonth()),
                             String.valueOf(currentMonthYear.getYear()))
             );
-            return;
         }
 
         double expectIncome = budget.get().getIncome();

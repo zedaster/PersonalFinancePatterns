@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.report;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.service.ReportService;
 
 /**
@@ -27,10 +28,9 @@ public class ReportExpensesHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         if (commandData.getArgs().size() != 1) {
-            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_SELF_REPORT_ARGS);
-            return;
+            throw new HandleCommandException(commandData, INCORRECT_SELF_REPORT_ARGS);
         }
         String report = this.reportService.getExpenseReport(session, commandData.getUser(), commandData.getArgs().get(0));
         commandData.getSender().sendMessage(commandData.getUser(), report);

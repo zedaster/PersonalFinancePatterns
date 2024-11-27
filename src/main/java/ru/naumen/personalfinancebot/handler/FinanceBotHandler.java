@@ -1,22 +1,15 @@
 package ru.naumen.personalfinancebot.handler;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.handler.command.*;
-import ru.naumen.personalfinancebot.handler.command.budget.*;
-import ru.naumen.personalfinancebot.handler.command.operation.AddOperationHandler;
-import ru.naumen.personalfinancebot.handler.command.report.AverageReportHandler;
-import ru.naumen.personalfinancebot.handler.command.report.EstimateReportHandler;
-import ru.naumen.personalfinancebot.handler.command.report.ReportExpensesHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
-import ru.naumen.personalfinancebot.model.CategoryType;
+import ru.naumen.personalfinancebot.handler.command.CommandHandler;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.repository.budget.BudgetRepository;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 import ru.naumen.personalfinancebot.repository.operation.OperationRepository;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
-import ru.naumen.personalfinancebot.service.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * Обработчик операций для бота "Персональный финансовый трекер"
@@ -28,9 +21,11 @@ public class FinanceBotHandler {
     private static final String COMMAND_NOT_FOUND = "Команда не распознана...";
 
     /**
-     * Коллекция, которая хранит обработчики для команд
+     * История выполненных команд
      */
-    private final Map<String, CommandHandler> commandHandlers;
+    private final CommandHistory commandHistory;
+
+    private final CommandHolder commandHolder;
 
     /**
      * @param userRepository      Репозиторий для работы с пользователем
@@ -42,58 +37,32 @@ public class FinanceBotHandler {
                              OperationRepository operationRepository,
                              CategoryRepository categoryRepository,
                              BudgetRepository budgetRepository) {
-        DateParseService dateParseService = new DateParseService();
-        NumberParseService numberParseService = new NumberParseService();
-        OutputNumberFormatService numberFormatService = new OutputNumberFormatService();
-        OutputMonthFormatService monthFormatService = new OutputMonthFormatService();
-        CategoryListService categoryListService = new CategoryListService(categoryRepository);
-        ReportService reportService = new ReportService(operationRepository, monthFormatService, numberFormatService);
-
-        commandHandlers = new HashMap<>();
-        commandHandlers.put("start", new StartCommandHandler());
-        commandHandlers.put("set_balance", new SetBalanceHandler(numberParseService, numberFormatService,
-                userRepository));
-        commandHandlers.put("add_expense", new AddOperationHandler(CategoryType.EXPENSE, userRepository,
-                categoryRepository, operationRepository));
-        commandHandlers.put("add_income", new AddOperationHandler(CategoryType.INCOME, userRepository,
-                categoryRepository, operationRepository));
-        commandHandlers.put("add_income_category", new AddCategoryHandler(CategoryType.INCOME, categoryRepository));
-        commandHandlers.put("add_expense_category", new AddCategoryHandler(CategoryType.EXPENSE, categoryRepository));
-        commandHandlers.put("remove_income_category", new RemoveCategoryHandler(CategoryType.INCOME,
-                categoryRepository));
-        commandHandlers.put("remove_expense_category", new RemoveCategoryHandler(CategoryType.EXPENSE,
-                categoryRepository));
-        commandHandlers.put("list_categories", new FullListCategoriesHandler(categoryListService));
-        commandHandlers.put("list_income_categories", new SingleListCategoriesHandler(CategoryType.INCOME,
-                categoryListService));
-        commandHandlers.put("list_expense_categories", new SingleListCategoriesHandler(CategoryType.EXPENSE,
-                categoryListService));
-        commandHandlers.put("report_expense", new ReportExpensesHandler(reportService));
-
-        commandHandlers.put("budget", new SingleBudgetHandler(budgetRepository, operationRepository,
-                numberFormatService, monthFormatService));
-        commandHandlers.put("budget_help", new HelpBudgetHandler());
-        commandHandlers.put("budget_create", new CreateBudgetHandler(budgetRepository, operationRepository));
-        commandHandlers.put("budget_set_income", new EditBudgetHandler(budgetRepository, numberParseService,
-                dateParseService, numberFormatService, monthFormatService, CategoryType.INCOME));
-        commandHandlers.put("budget_set_expenses", new EditBudgetHandler(budgetRepository, numberParseService,
-                dateParseService, numberFormatService, monthFormatService, CategoryType.EXPENSE));
-        commandHandlers.put("budget_list", new ListBudgetHandler(budgetRepository, operationRepository,
-                dateParseService, numberFormatService, monthFormatService));
-
-        commandHandlers.put("estimate_report", new LoggingDecorator(new EstimateReportHandler(dateParseService, reportService)));
-        commandHandlers.put("avg_report", new LoggingDecorator(new AverageReportHandler(dateParseService, reportService)));
+        commandHistory = new CommandHistory();
+        commandHolder = new CommandHolder(
+                userRepository,
+                operationRepository,
+                categoryRepository,
+                budgetRepository,
+                commandHistory);
     }
 
     /**
      * Вызывается при получении какой-либо команды от пользователя
      */
     public void handleCommand(CommandData commandData, Session session) {
-        CommandHandler handler = this.commandHandlers.get(commandData.getCommandName().toLowerCase());
-        if (handler != null) {
-            handler.handleCommand(commandData, session);
-        } else {
+        Optional<CommandHandler> handler = this.commandHolder.getCommandHandler(commandData.getCommandName());
+        if (handler.isEmpty()) {
             commandData.getSender().sendMessage(commandData.getUser(), COMMAND_NOT_FOUND);
+            return;
+        }
+
+        try {
+            handler.get().handleCommand(commandData, session);
+            if (!this.commandHolder.isUndoCommand(commandData.getCommandName())) {
+                commandHistory.add(commandData.toMemento());
+            }
+        } catch (HandleCommandException e) {
+            commandData.getSender().sendMessage(commandData.getUser(), e.getMessage());
         }
     }
 }

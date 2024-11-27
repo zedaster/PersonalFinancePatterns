@@ -1,7 +1,7 @@
 package ru.naumen.personalfinancebot.mode;
 
 import ru.naumen.personalfinancebot.bot.Bot;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.model.User;
 
 import java.util.List;

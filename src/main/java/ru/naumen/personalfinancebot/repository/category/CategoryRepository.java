@@ -57,7 +57,7 @@ public interface CategoryRepository {
             throws ExistingUserCategoryException, ExistingStandardCategoryException;
 
     /**
-     * Создаёт стандартную категорию, не относящуюся к пользователя
+     * Создаёт стандартную категорию, не относящуюся к пользователю
      *
      * @param categoryName Имя категории
      * @param type         Тип категории: расход / доход

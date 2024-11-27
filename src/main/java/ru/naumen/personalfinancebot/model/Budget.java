@@ -57,7 +57,7 @@ public class Budget {
      * @param user      Пользователь
      * @param income    Ожидаемый доход
      * @param expense   Ожидаемый расход
-     * @param yearMonth Год-месяй
+     * @param yearMonth Год-месяц
      */
     public Budget(User user, double income, double expense, YearMonth yearMonth) {
         this.user = user;

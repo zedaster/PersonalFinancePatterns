@@ -1,7 +1,8 @@
-package ru.naumen.personalfinancebot.handler.command;
+package ru.naumen.personalfinancebot.handler.command.category;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.CommandHandler;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.service.CategoryListService;
 

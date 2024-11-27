@@ -1,7 +1,9 @@
-package ru.naumen.personalfinancebot.handler.command;
+package ru.naumen.personalfinancebot.handler.command.category;
 
 import org.hibernate.Session;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.CommandHandler;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 import ru.naumen.personalfinancebot.repository.category.exception.NotExistingCategoryException;
@@ -45,22 +47,20 @@ public class RemoveCategoryHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         String typeLabel = categoryType.getPluralShowLabel();
         String categoryName;
         try {
             categoryName = categoryParseService.parseCategory(commandData.getArgs());
         } catch (IllegalArgumentException ex) {
-            commandData.getSender().sendMessage(commandData.getUser(), ex.getMessage());
-            return;
+            throw new HandleCommandException(commandData, ex.getMessage());
         }
 
         try {
             categoryRepository.removeUserCategoryByName(session, commandData.getUser(), categoryType, categoryName);
         } catch (NotExistingCategoryException e) {
             String responseText = USER_CATEGORY_ALREADY_NOT_EXISTS.formatted(typeLabel, categoryName);
-            commandData.getSender().sendMessage(commandData.getUser(), responseText);
-            return;
+            throw new HandleCommandException(commandData, responseText);
         }
 
         String responseText = USER_CATEGORY_REMOVED.formatted(typeLabel, categoryName);

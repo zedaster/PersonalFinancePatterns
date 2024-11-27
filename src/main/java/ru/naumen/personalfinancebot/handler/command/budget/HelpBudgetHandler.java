@@ -2,7 +2,7 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 
 
 /**

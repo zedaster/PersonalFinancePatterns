@@ -3,9 +3,10 @@ package me.zedaster.financeadminui.frame;
 import me.zedaster.financeadminui.component.*;
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.CommandSender;
-import ru.naumen.personalfinancebot.handler.command.AddCategoryHandler;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.command.category.AddCategoryHandler;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
@@ -67,7 +68,6 @@ public class AddCategoryFrameManager implements FrameManager, CommandSender {
         }
         if (sender == this.cancelButton && event == FrameEvent.BUTTON_PUSHED) {
             setVisible(false);
-            return;
         }
     }
 
@@ -89,12 +89,16 @@ public class AddCategoryFrameManager implements FrameManager, CommandSender {
             }
 
             CommandHandler command = new AddCategoryHandler(typeSelector.getValue(), categoryRepository);
-            command.handleCommand(new CommandData(
-                    this,
-                    user,
-                    null,
-                    Arrays.asList(this.categoryNameField.getValue().split(" "))),
-                    session);
+            try {
+                command.handleCommand(new CommandData(
+                        this,
+                        user,
+                        null,
+                        Arrays.asList(this.categoryNameField.getValue().split(" "))),
+                        session);
+            } catch (HandleCommandException e) {
+                this.notificationView.showNotification(e.getMessage());
+            }
         });
     }
 

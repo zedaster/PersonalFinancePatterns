@@ -135,3 +135,12 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 ### Причины реализации паттерна
 * Необходимость объединить множества компонентов
 * Необходимость реализовать общую для компонентов логику в одном месте
+
+## Задание 20. Momento
+Класс (снимок): CommandMomento [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/data/CommandMemento.java)
+Опекун: FinanceBotHandler [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/FinanceBotHandler.java)
+Команда для отката действия: UndoCommand [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/command/UndoCommandHandler.java)
+
+### Причины реализации паттерна
+* Нужно кэшировать часть данных о команде для ее отката
+* Некоторые данные из CommandData должны быть невидимы при кэшировании

@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.budget;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.handler.validator.ArgumentValidator;
 import ru.naumen.personalfinancebot.handler.validator.ArgumentValidatorException;
 import ru.naumen.personalfinancebot.message.Message;
@@ -63,7 +64,7 @@ public class CreateBudgetHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         YearMonth yearMonth;
         double expectedIncome;
         double expectedExpenses;
@@ -75,13 +76,11 @@ public class CreateBudgetHandler implements CommandHandler {
             expectedIncome = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
             expectedExpenses = validator.parseNextValidPositiveDouble(Message.INCORRECT_BUDGET_NUMBER_ARG);
         } catch (ArgumentValidatorException e) {
-            commandData.getSender().sendMessage(commandData.getUser(), e.getInvalidMessage());
-            return;
+            throw new HandleCommandException(commandData, e.getInvalidMessage());
         }
 
         if (yearMonth.isBefore(YearMonth.now())) {
-            commandData.getSender().sendMessage(commandData.getUser(), CANT_CREATE_OLD_BUDGET);
-            return;
+            throw new HandleCommandException(commandData, CANT_CREATE_OLD_BUDGET);
         }
 
         User user = commandData.getUser();

@@ -1,4 +1,4 @@
-package ru.naumen.personalfinancebot.handler.commandData;
+package ru.naumen.personalfinancebot.handler.data;
 
 import ru.naumen.personalfinancebot.handler.CommandSender;
 import ru.naumen.personalfinancebot.model.User;
@@ -70,5 +70,9 @@ public class CommandData {
 
     public CommandData copy() {
         return new CommandData(sender, user, commandName, args);
+    }
+
+    public CommandMemento toMemento() {
+        return new CommandMemento(user, commandName, args);
     }
 }

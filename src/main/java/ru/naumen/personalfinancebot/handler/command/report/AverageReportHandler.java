@@ -2,7 +2,8 @@ package ru.naumen.personalfinancebot.handler.command.report;
 
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.command.CommandHandler;
-import ru.naumen.personalfinancebot.handler.commandData.CommandData;
+import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
+import ru.naumen.personalfinancebot.handler.data.CommandData;
 import ru.naumen.personalfinancebot.message.Message;
 import ru.naumen.personalfinancebot.service.DateParseService;
 import ru.naumen.personalfinancebot.service.ReportService;
@@ -38,16 +39,14 @@ public class AverageReportHandler implements CommandHandler {
     }
 
     @Override
-    public void handleCommand(CommandData commandData, Session session) {
+    public void handleCommand(CommandData commandData, Session session) throws HandleCommandException {
         YearMonth yearMonth;
         try {
             yearMonth = this.dateParseService.parseYearMonthArgs(commandData.getArgs());
         } catch (DateTimeParseException exception) {
-            commandData.getSender().sendMessage(commandData.getUser(), Message.INCORRECT_YEAR_MONTH_FORMAT);
-            return;
+            throw new HandleCommandException(commandData, Message.INCORRECT_YEAR_MONTH_FORMAT);
         } catch (IllegalArgumentException exception) {
-            commandData.getSender().sendMessage(commandData.getUser(), INCORRECT_ARGUMENT_COUNT);
-            return;
+            throw new HandleCommandException(commandData, INCORRECT_ARGUMENT_COUNT);
         }
 
         String report = this.reportService.getAverageReport(session, yearMonth);
