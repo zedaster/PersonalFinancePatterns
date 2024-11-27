@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class CommandData {
     /**
-     * Бот, который обрабатывает команду
+     * Источник, который вызывает команду
      */
     private final CommandSender sender;
 
@@ -44,7 +44,7 @@ public class CommandData {
     }
 
     /**
-     * Получает пользователя, который отправил команду
+     * Получает пользователя, для которого выполняется команда
      */
     public User getUser() {
         return user;

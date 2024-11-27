@@ -144,3 +144,10 @@ UserRepository [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repos
 ### Причины реализации паттерна
 * Нужно кэшировать часть данных о команде для ее отката
 * Некоторые данные из CommandData должны быть невидимы при кэшировании
+
+## Задание 21. Observer
+Класс: AddCategoryNotificator [(ссылка)](src/main/java/me/zedaster/financeadminui/frame/AddCategoryFrameManager.java)
+
+### Причины реализации паттерна
+* Необходимость отслеживать состояние объекта в определенных случаях. (Отслеживать добавления категории при добавлении 
+администратором)

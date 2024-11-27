@@ -3,10 +3,9 @@ package me.zedaster.financeadminui.frame;
 import me.zedaster.financeadminui.component.*;
 import org.hibernate.Session;
 import ru.naumen.personalfinancebot.handler.CommandSender;
-import ru.naumen.personalfinancebot.handler.command.CommandHandler;
 import ru.naumen.personalfinancebot.handler.command.HandleCommandException;
-import ru.naumen.personalfinancebot.handler.command.category.AddCategoryHandler;
 import ru.naumen.personalfinancebot.handler.data.CommandData;
+import ru.naumen.personalfinancebot.handler.command.category.AddCategoryHandler;
 import ru.naumen.personalfinancebot.model.CategoryType;
 import ru.naumen.personalfinancebot.model.User;
 import ru.naumen.personalfinancebot.repository.TransactionManager;
@@ -14,7 +13,9 @@ import ru.naumen.personalfinancebot.repository.category.CategoryRepository;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // Паттерн Mediator
 public class AddCategoryFrameManager implements FrameManager, CommandSender {
@@ -36,12 +37,11 @@ public class AddCategoryFrameManager implements FrameManager, CommandSender {
 
     private final UserRepository userRepository;
 
-    private final CategoryRepository categoryRepository;
+    private final Map<CategoryType, AddCategoryHandler> addCommandHandlers;
 
     public AddCategoryFrameManager(TransactionManager transactionManager, UserRepository userRepository, CategoryRepository categoryRepository) {
         this.transactionManager = transactionManager;
         this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
         this.userIdField = new Field(this, "User Id");
         this.typeSelector = new Selector<>(this, "Тип категории", List.of(CategoryType.values()));
         this.categoryNameField = new Field(this, "Имя категории");
@@ -58,6 +58,14 @@ public class AddCategoryFrameManager implements FrameManager, CommandSender {
                 )
         );
         this.notificationView = new NotificationView();
+
+        this.addCommandHandlers = new HashMap<>();
+        AddCategoryNotificator addCategoryNotificator = new AddCategoryNotificator();
+        for (CategoryType type : CategoryType.values()) {
+            AddCategoryHandler handler = new AddCategoryHandler(type, categoryRepository);
+            handler.addObserver(addCategoryNotificator);
+            this.addCommandHandlers.put(type, handler);
+        }
     }
 
     @Override
@@ -88,9 +96,9 @@ public class AddCategoryFrameManager implements FrameManager, CommandSender {
                 return;
             }
 
-            CommandHandler command = new AddCategoryHandler(typeSelector.getValue(), categoryRepository);
+            AddCategoryHandler commandHandler = addCommandHandlers.get(typeSelector.getValue());
             try {
-                command.handleCommand(new CommandData(
+                commandHandler.handleCommand(new CommandData(
                         this,
                         user,
                         null,
