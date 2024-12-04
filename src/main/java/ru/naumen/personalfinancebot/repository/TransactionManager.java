@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 /**
  * Базовый класс для репозитория, работающего на Hibernate
  */
+// Паттерн Strategy
 public class TransactionManager {
     /**
      * Фабрика для открытия сессий
