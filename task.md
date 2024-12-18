@@ -23,6 +23,14 @@
 ## Причины реализации паттерна
 * Ввод именного конструктора. В перспективе, их может быть множество для разных типов ботов.
 
+## Задание 5. Builder
+
+Класс: TelegramBotBuilder [(ссылка)](src/main/java/ru/naumen/personalfinancebot/bot/TelegramBotBuilder.java)
+
+### Причины реализации паттерна
+* Необходимость создания объекта TelegramBot с большим количеством параметров
+* Часть из параметров опциональна
+
 ## Задание 7. Abstract Factory
 
 Пакет: ru.naumen.personalfinancebot.repository  [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository)

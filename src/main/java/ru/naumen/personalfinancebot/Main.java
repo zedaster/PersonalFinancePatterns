@@ -3,12 +3,11 @@ package ru.naumen.personalfinancebot;
 import org.hibernate.SessionFactory;
 import ru.naumen.personalfinancebot.bot.Bot;
 import ru.naumen.personalfinancebot.bot.PoolingException;
-import ru.naumen.personalfinancebot.bot.TelegramBot;
+import ru.naumen.personalfinancebot.bot.TelegramBotBuilder;
 import ru.naumen.personalfinancebot.configuration.HibernateConfiguration;
 import ru.naumen.personalfinancebot.configuration.StandardCategoryConfiguration;
 import ru.naumen.personalfinancebot.configuration.TelegramBotConfiguration;
 import ru.naumen.personalfinancebot.handler.FinanceBotHandler;
-import ru.naumen.personalfinancebot.mode.FormatMode;
 import ru.naumen.personalfinancebot.mode.NormalFormatMode;
 import ru.naumen.personalfinancebot.model.Category;
 import ru.naumen.personalfinancebot.repository.HibernateRepositoryFactory;
@@ -50,18 +49,13 @@ public class Main {
                 budgetRepository
         );
 
-        // Можно запускать разных ботов с разными режимами форматирования
-
-        FormatMode mode = new NormalFormatMode();
-
-        TelegramBotConfiguration configuration = new TelegramBotConfiguration();
-        Bot bot = new TelegramBot(
-                configuration,
-                handler,
-                userRepository,
-                transactionManager,
-                mode
-        );
+        Bot bot = new TelegramBotBuilder()
+                .setConfiguration(TelegramBotConfiguration.fromEnv())
+                .setHandler(handler)
+                .setUserRepository(userRepository)
+                .setTransactionManager(transactionManager)
+                .setMode(new NormalFormatMode())
+                .build();
 
         try {
             bot.startPooling();

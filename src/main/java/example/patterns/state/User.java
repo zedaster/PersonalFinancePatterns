@@ -1,7 +1,7 @@
 package example.patterns.state;
 
-import example.patterns.state.state.WaitingCommandState;
 import example.patterns.state.state.UserState;
+import example.patterns.state.state.WaitingCommandState;
 
 public class User {
     private final String username;

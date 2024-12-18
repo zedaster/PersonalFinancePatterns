@@ -17,8 +17,8 @@ public class TelegramBotConfiguration {
     /**
      * Конструктор с настройками из переменных окружения
      */
-    public TelegramBotConfiguration() {
-        this(
+    public static TelegramBotConfiguration fromEnv() {
+        return new TelegramBotConfiguration(
                 System.getenv("BOT_TOKEN"),
                 System.getenv("BOT_NAME")
         );
