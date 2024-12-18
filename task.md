@@ -9,6 +9,12 @@
 * Отсутствие повторного вызова также гарантирует консистентность данных (список категорий будет всегда такой же)
 
 
+## Задание 3. Prototype
+
+Класс: CommandData [(ссылка)](src/main/java/ru/naumen/personalfinancebot/handler/data/CommandData.java)
+
+### Причины реализации паттерна
+* Необходимость создания независимых копий объекта CommandData.
 
 ## Задание 7. Abstract Factory
 
