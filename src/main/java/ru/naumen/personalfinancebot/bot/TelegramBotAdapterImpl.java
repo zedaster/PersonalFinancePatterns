@@ -12,7 +12,6 @@ import ru.naumen.personalfinancebot.repository.TransactionManager;
 import ru.naumen.personalfinancebot.repository.user.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 // Паттерн Adapter
 public class TelegramBotAdapterImpl extends TelegramLongPollingBot implements TelegramAdapter {
@@ -53,17 +52,19 @@ public class TelegramBotAdapterImpl extends TelegramLongPollingBot implements Te
             try {
                 transactionManager.produceTransaction(session -> {
                     Long chatId = update.getMessage().getChatId();
-                    Optional<User> user = this.userRepository.getUserByTelegramChatId(session, chatId);
-                    if (user.isEmpty()) {
-                        user = Optional.of(new User(chatId, 0));
-                        this.userRepository.saveUser(session, user.get());
-                    }
+                    User user = this.userRepository
+                            .getUserByTelegramChatId(session, chatId)
+                            .orElseGet(() -> {
+                                User newUser = User.newFromTelegramChatId(chatId);
+                                this.userRepository.saveUser(session, newUser);
+                                return newUser;
+                            });
 
                     List<String> msgWords = List.of(update.getMessage().getText().split(" "));
                     String cmdName = msgWords.get(0).substring(1);
                     List<String> args = msgWords.subList(1, msgWords.size());
 
-                    updateHandler.onCommandReceived(session, user.get(), cmdName, args);
+                    updateHandler.onCommandReceived(session, user, cmdName, args);
                 });
             } catch (RuntimeException e) {
                 System.err.println("Произошла ошибка во время обработки команды в боте:");

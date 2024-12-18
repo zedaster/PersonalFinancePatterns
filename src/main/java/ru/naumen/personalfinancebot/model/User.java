@@ -7,6 +7,7 @@ import java.util.Objects;
 /**
  * Модель пользователя
  */
+// Паттерн Static Factory Method
 @Entity
 @Table(name = "users")
 public class User {
@@ -49,6 +50,15 @@ public class User {
     }
 
     public User() {}
+
+    /**
+     * Создает нового пользователя по ID чата в Telegram
+     * @param chatId ID чата
+     * @return Новый пользователь
+     */
+    public static User newFromTelegramChatId(long chatId) {
+        return new User(chatId, 0);
+    }
 
     /**
      * @return ID пользователя

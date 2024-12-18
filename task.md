@@ -16,6 +16,13 @@
 ### Причины реализации паттерна
 * Необходимость создания независимых копий объекта CommandData.
 
+## Задание 4. Static Factory Method
+
+Класс: User [(ссылка)](src/main/java/ru/naumen/personalfinancebot/model/User.java)
+
+## Причины реализации паттерна
+* Ввод именного конструктора. В перспективе, их может быть множество для разных типов ботов.
+
 ## Задание 7. Abstract Factory
 
 Пакет: ru.naumen.personalfinancebot.repository  [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository)
