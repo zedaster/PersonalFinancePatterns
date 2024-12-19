@@ -31,6 +31,15 @@
 * Необходимость создания объекта TelegramBot с большим количеством параметров
 * Часть из параметров опциональна
 
+## Задание 6. Factory Method
+
+Классы: SingleCategoryFactory [(ссылка)](src/main/java/ru/naumen/personalfinancebot/model/category/SingleCategoryFactory.java),
+StandardCategoryFactory [(ссылка)](src/main/java/ru/naumen/personalfinancebot/model/category/StandardCategoryFactory.java),
+UserCategoryFactory [(ссылка)](src/main/java/ru/naumen/personalfinancebot/model/category/UserCategoryFactory.java).
+
+### Причины реализации паттерна
+* Необходимо инкапсулировать логику создания объектов
+
 ## Задание 7. Abstract Factory
 
 Пакет: ru.naumen.personalfinancebot.repository  [(ссылка)](src/main/java/ru/naumen/personalfinancebot/repository)
